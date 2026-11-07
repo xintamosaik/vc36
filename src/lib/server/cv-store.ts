@@ -57,6 +57,7 @@ function normalizeExperience(value: unknown): unknown {
 			if (!isRecord(job) || !Array.isArray(job.bullets)) return job;
 			return {
 				...job,
+				id: typeof job.id === 'string' && job.id.length > 0 ? job.id : randomUUID(),
 				bullets: job.bullets.map((bullet) => {
 					if (!isRecord(bullet) || !isTextSegmentArray(bullet.content)) return bullet;
 					return {
@@ -67,6 +68,28 @@ function normalizeExperience(value: unknown): unknown {
 			};
 		})
 	};
+}
+
+function normalizeSkills(value: unknown): unknown {
+	if (!isRecord(value) || !Array.isArray(value.skills)) return value;
+	return {
+		...value,
+		skills: value.skills.map((skill) =>
+			isRecord(skill)
+				? {
+						...skill,
+						id: typeof skill.id === 'string' && skill.id.length > 0 ? skill.id : randomUUID()
+					}
+				: skill
+		)
+	};
+}
+
+function hasUniqueIds(items: unknown[]): boolean {
+	const ids = items.map((item) => (isRecord(item) ? item.id : undefined));
+	return (
+		ids.every((id) => typeof id === 'string' && id.length > 0) && new Set(ids).size === ids.length
+	);
 }
 
 export function isCvSection(value: string): value is CvSection {
@@ -99,6 +122,7 @@ export function isCvSectionData(section: CvSection, value: unknown): boolean {
 		case 'experience':
 			return (
 				Array.isArray(value.jobs) &&
+				hasUniqueIds(value.jobs) &&
 				value.jobs.every(
 					(job) =>
 						isRecord(job) &&
@@ -118,6 +142,7 @@ export function isCvSectionData(section: CvSection, value: unknown): boolean {
 		case 'skills':
 			return (
 				Array.isArray(value.skills) &&
+				hasUniqueIds(value.skills) &&
 				value.skills.every(
 					(skill) =>
 						isRecord(skill) && typeof skill.label === 'string' && typeof skill.value === 'string'
@@ -156,10 +181,13 @@ async function readSection<K extends CvSection>(section: K): Promise<CvData[K]> 
 			? normalizeCommercialImpact(parsed)
 			: section === 'experience'
 				? normalizeExperience(parsed)
-				: parsed;
+				: section === 'skills'
+					? normalizeSkills(parsed)
+					: parsed;
 	if (!isCvSectionData(section, value)) {
 		throw new Error(`Invalid CV data in ${filePath}`);
 	}
+	if (JSON.stringify(value) !== JSON.stringify(parsed)) await writeCvSection(section, value);
 	return value as CvData[K];
 }
 

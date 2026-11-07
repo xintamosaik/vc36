@@ -24,6 +24,7 @@ export type ExperienceBullet = {
 };
 
 export type Job = {
+	id: string;
 	role: string;
 	company: string;
 	dates: string;
@@ -38,8 +39,10 @@ export type Experience = {
 
 export type Skills = {
 	title: string;
-	skills: { label: string; value: string }[];
+	skills: Skill[];
 };
+
+export type Skill = { id: string; label: string; value: string };
 
 export type Education = {
 	title: string;
@@ -62,3 +65,16 @@ export type CvData = {
 };
 
 export type CvSection = keyof CvData;
+
+export type CvVariantSkillChange =
+	{ kind: 'hidden' } | { kind: 'replacement'; label: string; value: string };
+
+export type CvVariant = {
+	id: string;
+	name: string;
+	hiddenSections: CvSection[];
+	sectionTitles: Partial<Record<Exclude<CvSection, 'header'>, string>>;
+	hiddenJobIds: string[];
+	skillChanges: Record<string, CvVariantSkillChange>;
+	addedSkills: Skill[];
+};

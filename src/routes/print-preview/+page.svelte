@@ -12,7 +12,7 @@
 </svelte:head>
 
 <div class="mx-auto w-full max-w-[75ch] px-4 py-6">
-	<WorkspaceNavigation active="preview" />
+	<WorkspaceNavigation active="preview" variantId={data.variantId ?? undefined} />
 	<PrintPreview />
-	<CvDocument data={data.cv} />
+	<CvDocument data={data.cv} hiddenSections={data.hiddenSections} />
 </div>

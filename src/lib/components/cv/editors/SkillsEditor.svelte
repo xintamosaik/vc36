@@ -8,7 +8,7 @@
 	let selectedSkillIndex = $state(data.skills.length > 0 ? 0 : -1);
 
 	function addSkill() {
-		data.skills.push({ label: '', value: '' });
+		data.skills.push({ id: crypto.randomUUID(), label: '', value: '' });
 		selectedSkillIndex = data.skills.length - 1;
 	}
 

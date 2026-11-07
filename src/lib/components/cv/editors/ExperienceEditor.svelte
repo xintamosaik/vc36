@@ -9,6 +9,7 @@
 
 	function addJob() {
 		data.jobs.push({
+			id: crypto.randomUUID(),
 			role: '',
 			company: '',
 			dates: '',

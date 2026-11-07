@@ -2,6 +2,7 @@
 	"title": "Experience",
 	"jobs": [
 		{
+			"id": "job-iq-digital",
 			"role": "Software Engineer",
 			"company": "iq digital media marketing gmbh",
 			"dates": "Jan 2024 - May 2025",
@@ -34,6 +35,7 @@
 			]
 		},
 		{
+			"id": "job-aufinity",
 			"role": "Software Engineer",
 			"company": "aufinity Group GmbH",
 			"dates": "Sep 2025 - Now",
@@ -57,6 +59,7 @@
 			]
 		},
 		{
+			"id": "job-qanuk",
 			"role": "Full Stack Developer",
 			"company": "Qanuk GmbH",
 			"dates": "April 2021 - December 2023",
