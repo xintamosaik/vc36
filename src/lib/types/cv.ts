@@ -10,7 +10,7 @@ export type CvHeader = {
 
 export type CommercialImpact = {
 	title: string;
-	highlights: TextSegment[][];
+	highlights: string[];
 };
 
 export type Summary = {

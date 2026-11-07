@@ -21,7 +21,7 @@
 		/>
 	{/each}
 	<div class="cv-editor-actions">
-		<button class="cv-editor-button" type="button" onclick={() => data.highlights.push([''])}
+		<button class="cv-editor-button" type="button" onclick={() => data.highlights.push('')}
 			>Add highlight</button
 		>
 		<button class="cv-editor-button cv-editor-button-primary" type="button" onclick={onSave}

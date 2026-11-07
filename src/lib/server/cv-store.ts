@@ -36,6 +36,28 @@ function isTextSegmentArray(value: unknown): value is TextSegment[] {
 	return Array.isArray(value) && value.every(isTextSegment);
 }
 
+function normalizeCommercialImpact(value: unknown): unknown {
+	if (!isRecord(value) || !Array.isArray(value.highlights)) return value;
+	if (value.highlights.every((highlight) => typeof highlight === 'string')) return value;
+	if (typeof value.title === 'string' && value.highlights.every(isTextSegmentArray)) {
+		return {
+			...value,
+			highlights: value.highlights.map((highlight) =>
+				highlight
+					.map((segment) =>
+						typeof segment === 'string'
+							? segment
+							: segment.strong
+								? `##${segment.text}##`
+								: segment.text
+					)
+					.join('')
+			)
+		};
+	}
+	return value;
+}
+
 export function isCvSection(value: string): value is CvSection {
 	return Object.hasOwn(fileNames, value);
 }
@@ -60,7 +82,7 @@ export function isCvSectionData(section: CvSection, value: unknown): boolean {
 				)
 			);
 		case 'commercialImpact':
-			return Array.isArray(value.highlights) && value.highlights.every(isTextSegmentArray);
+			return isStringArray(value.highlights);
 		case 'summary':
 			return isStringArray(value.paragraphs);
 		case 'experience':
@@ -117,7 +139,8 @@ async function readSection<K extends CvSection>(section: K): Promise<CvData[K]> 
 		throw cause;
 	}
 
-	const value: unknown = JSON.parse(serialized);
+	const parsed: unknown = JSON.parse(serialized);
+	const value = section === 'commercialImpact' ? normalizeCommercialImpact(parsed) : parsed;
 	if (!isCvSectionData(section, value)) {
 		throw new Error(`Invalid CV data in ${filePath}`);
 	}

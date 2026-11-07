@@ -1,13 +1,8 @@
 {
 	"title": "Commercial Impact Highlights",
 	"highlights": [
-		[
-			{ "text": "Replaced a 5,000+ LOC legacy AdController", "strong": true },
-			" with a 60-line config-driven system → removed third-party dependency and enabled version-controlled deployments"
-		],
-		[
-			"Reduced delivery feedback loops from 3–5 minutes to under 1 second, accelerating iteration and release confidence"
-		],
-		["Cut bug rates ~20% in key workflows, improving system stability and stakeholder trust"]
+		"##Replaced a 5,000+ LOC legacy AdController## with a 60-line config-driven system → removed third-party dependency and enabled version-controlled deployments",
+		"Reduced delivery feedback loops from 3–5 minutes to under 1 second, accelerating iteration and release confidence",
+		"Cut bug rates ~20% in key workflows, improving system stability and stakeholder trust"
 	]
 }
