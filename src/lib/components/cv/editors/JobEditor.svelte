@@ -1,8 +1,21 @@
 <script lang="ts">
 	import ExperienceBulletEditor from '#lib/components/cv/editors/ExperienceBulletEditor.svelte';
+	import ItemSelector from '#lib/components/cv/editors/ItemSelector.svelte';
+	import { selectedIndexAfterRemoval } from '#lib/components/cv/editors/item-selection.js';
 	import type { Job } from '#lib/types/cv.js';
 
 	let { job = $bindable(), onRemove }: { job: Job; onRemove: () => void } = $props();
+	let selectedBulletIndex = $state(job.bullets.length > 0 ? 0 : -1);
+
+	function addBullet() {
+		job.bullets.push({ content: '' });
+		selectedBulletIndex = job.bullets.length - 1;
+	}
+
+	function removeBullet(index: number) {
+		job.bullets.splice(index, 1);
+		selectedBulletIndex = selectedIndexAfterRemoval(selectedBulletIndex, index, job.bullets.length);
+	}
 </script>
 
 <article class="cv-editor-entry">
@@ -12,18 +25,20 @@
 	<label class="cv-editor-field">Dates <input bind:value={job.dates} /></label>
 	<label class="cv-editor-field">Location <input bind:value={job.location} /></label>
 	<h4>Experience bullets</h4>
-	{#each job.bullets as bullet, index (index)}
+	<ItemSelector
+		items={job.bullets.map((bullet) => bullet.content.replaceAll('##', ''))}
+		bind:selectedIndex={selectedBulletIndex}
+		itemLabel="bullet"
+		ariaLabel="Job experience bullets"
+		onAdd={addBullet}
+	/>
+	{#if selectedBulletIndex >= 0}
 		<ExperienceBulletEditor
-			bind:bullet={job.bullets[index]}
-			onRemove={() => job.bullets.splice(job.bullets.indexOf(bullet), 1)}
+			bind:bullet={job.bullets[selectedBulletIndex]}
+			onRemove={() => removeBullet(selectedBulletIndex)}
 		/>
-	{/each}
+	{/if}
 	<div class="cv-editor-actions">
-		<button
-			class="cv-editor-button"
-			type="button"
-			onclick={() => job.bullets.push({ content: [''] })}>Add bullet</button
-		>
 		<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
 			>Remove job</button
 		>

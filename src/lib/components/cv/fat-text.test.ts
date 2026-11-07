@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseFatText } from './fat-text.js';
+import { parseFatText, stringifyFatText } from '#lib/fat-text.js';
 
 describe('parseFatText', () => {
 	it('parses double-hash emphasis and leaves other text plain', () => {
@@ -12,5 +12,11 @@ describe('parseFatText', () => {
 
 	it('leaves unmatched delimiters as plain text', () => {
 		expect(parseFatText('Literal ## delimiter')).toEqual(['Literal ## delimiter']);
+	});
+
+	it('converts legacy rich-text segments to FAT text', () => {
+		expect(stringifyFatText([{ text: 'Bold', strong: true }, ' and ', { text: 'plain' }])).toBe(
+			'##Bold## and plain'
+		);
 	});
 });

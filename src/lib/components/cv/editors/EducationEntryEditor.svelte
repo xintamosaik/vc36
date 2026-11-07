@@ -21,7 +21,8 @@
 	<label class="cv-editor-field">Location <input bind:value={entry.location} /></label>
 	<label class="cv-editor-field">
 		Specialization
-		<textarea bind:value={entry.specialization}></textarea>
+		<textarea bind:value={entry.specialization} placeholder="Wrap bold text in ##double hashes##"
+		></textarea>
 	</label>
 	<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
 		>Remove education</button

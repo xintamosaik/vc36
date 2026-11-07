@@ -19,7 +19,7 @@ export type Summary = {
 };
 
 export type ExperienceBullet = {
-	content: TextSegment[];
+	content: string;
 	paragraph?: boolean;
 };
 

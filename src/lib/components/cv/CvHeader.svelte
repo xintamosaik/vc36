@@ -1,4 +1,5 @@
 <script lang="ts">
+	import FatText from '#lib/components/cv/FatText.svelte';
 	import type { CvHeader } from '#lib/types/cv.js';
 
 	let { data }: { data: CvHeader } = $props();
@@ -22,7 +23,7 @@
 	<p>
 		{#each data.relocation as item, index (index)}
 			{#if index > 0}<span class="dash"></span>{/if}
-			<span>{item}</span>
+			<span><FatText text={item} /></span>
 		{/each}
 	</p>
 </section>

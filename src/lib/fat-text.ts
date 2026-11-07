@@ -15,3 +15,11 @@ export function parseFatText(text: string): TextSegment[] {
 	if (cursor < text.length) segments.push(text.slice(cursor));
 	return segments;
 }
+
+export function stringifyFatText(segments: TextSegment[]): string {
+	return segments
+		.map((segment) =>
+			typeof segment === 'string' ? segment : segment.strong ? `##${segment.text}##` : segment.text
+		)
+		.join('');
+}

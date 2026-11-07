@@ -1,6 +1,5 @@
 <script lang="ts">
-	import RichText from '#lib/components/cv/RichText.svelte';
-	import { parseFatText } from '#lib/components/cv/fat-text.js';
+	import FatText from '#lib/components/cv/FatText.svelte';
 	import type { CommercialImpact } from '#lib/types/cv.js';
 
 	let { data }: { data: CommercialImpact } = $props();
@@ -10,7 +9,7 @@
 	<h2>{data.title}</h2>
 	<ul>
 		{#each data.highlights as highlight, index (index)}
-			<li><RichText segments={parseFatText(highlight)} /></li>
+			<li><FatText text={highlight} /></li>
 		{/each}
 	</ul>
 </section>

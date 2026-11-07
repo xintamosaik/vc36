@@ -1,5 +1,4 @@
 <script lang="ts">
-	import RichTextEditor from '#lib/components/cv/editors/RichTextEditor.svelte';
 	import type { ExperienceBullet } from '#lib/types/cv.js';
 
 	let {
@@ -21,7 +20,11 @@
 		/>
 		Use paragraph spacing
 	</label>
-	<RichTextEditor bind:segments={bullet.content} />
+	<label class="cv-editor-field">
+		Bullet text
+		<textarea bind:value={bullet.content} placeholder="Wrap bold text in ##double hashes##"
+		></textarea>
+	</label>
 	<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
 		>Remove bullet</button
 	>

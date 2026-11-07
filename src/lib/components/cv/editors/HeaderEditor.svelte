@@ -1,5 +1,7 @@
 <script lang="ts">
 	import HeaderLinkEditor from '#lib/components/cv/editors/HeaderLinkEditor.svelte';
+	import ItemSelector from '#lib/components/cv/editors/ItemSelector.svelte';
+	import { selectedIndexAfterRemoval } from '#lib/components/cv/editors/item-selection.js';
 	import type { CvHeader } from '#lib/types/cv.js';
 
 	let { data = $bindable(), onSave }: { data: CvHeader; onSave: () => void } = $props();
@@ -12,19 +14,24 @@
 
 	function removeLink(index: number) {
 		data.links.splice(index, 1);
-		selectedLinkIndex =
-			data.links.length === 0
-				? -1
-				: selectedLinkIndex === index
-					? Math.min(index, data.links.length - 1)
-					: selectedLinkIndex > index
-						? selectedLinkIndex - 1
-						: selectedLinkIndex;
+		selectedLinkIndex = selectedIndexAfterRemoval(selectedLinkIndex, index, data.links.length);
 	}
 
-	function linkNumber(index: number) {
-		return ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'][index] ?? `${index + 1}`;
+	function addRelocation() {
+		data.relocation.push('');
+		selectedRelocationIndex = data.relocation.length - 1;
 	}
+
+	function removeRelocation(index: number) {
+		data.relocation.splice(index, 1);
+		selectedRelocationIndex = selectedIndexAfterRemoval(
+			selectedRelocationIndex,
+			index,
+			data.relocation.length
+		);
+	}
+
+	let selectedRelocationIndex = $state(data.relocation.length > 0 ? 0 : -1);
 </script>
 
 <section class="cv-editor-section">
@@ -36,50 +43,39 @@
 		<textarea bind:value={data.subtitle}></textarea>
 	</label>
 	<h3>Relocation notes</h3>
-	{#each data.relocation as item, index (index)}
+	<ItemSelector
+		items={data.relocation}
+		bind:selectedIndex={selectedRelocationIndex}
+		itemLabel="relocation note"
+		ariaLabel="Relocation notes"
+		onAdd={addRelocation}
+	/>
+	{#if selectedRelocationIndex >= 0}
 		<div class="cv-editor-row">
 			<label class="cv-editor-field">
 				Note
 				<input
-					value={item}
-					oninput={(event) => (data.relocation[index] = event.currentTarget.value)}
+					value={data.relocation[selectedRelocationIndex]}
+					placeholder="Wrap bold text in ##double hashes##"
+					oninput={(event) =>
+						(data.relocation[selectedRelocationIndex] = event.currentTarget.value)}
 				/>
 			</label>
 			<button
 				class="cv-editor-button cv-editor-button-danger"
 				type="button"
-				onclick={() => data.relocation.splice(index, 1)}>Remove</button
+				onclick={() => removeRelocation(selectedRelocationIndex)}>Remove</button
 			>
 		</div>
-	{/each}
-	<button class="cv-editor-button" type="button" onclick={() => data.relocation.push('')}
-		>Add note</button
-	>
+	{/if}
 	<h3>Links</h3>
-	<div class="cv-editor-item-nav" role="group" aria-label="Header links">
-		{#each data.links as link, index (index)}
-			<button
-				class="cv-editor-item-button"
-				class:active={selectedLinkIndex === index}
-				type="button"
-				aria-label={`Edit link ${index + 1}${link.label ? `: ${link.label}` : ''}`}
-				aria-pressed={selectedLinkIndex === index}
-				title={link.label || `Link ${index + 1}`}
-				onclick={() => (selectedLinkIndex = index)}
-			>
-				<span aria-hidden="true">{linkNumber(index)}</span>
-			</button>
-		{/each}
-		<button
-			class="cv-editor-item-button"
-			type="button"
-			aria-label="Add link"
-			title="Add link"
-			onclick={addLink}
-		>
-			<span aria-hidden="true">➕</span>
-		</button>
-	</div>
+	<ItemSelector
+		items={data.links.map((link) => link.label)}
+		bind:selectedIndex={selectedLinkIndex}
+		itemLabel="link"
+		ariaLabel="Header links"
+		onAdd={addLink}
+	/>
 	{#if selectedLinkIndex >= 0}
 		<HeaderLinkEditor
 			bind:link={data.links[selectedLinkIndex]}

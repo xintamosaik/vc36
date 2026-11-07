@@ -1,5 +1,7 @@
 <script lang="ts">
 	import HighlightEditor from '#lib/components/cv/editors/HighlightEditor.svelte';
+	import ItemSelector from '#lib/components/cv/editors/ItemSelector.svelte';
+	import { selectedIndexAfterRemoval } from '#lib/components/cv/editors/item-selection.js';
 	import type { CommercialImpact } from '#lib/types/cv.js';
 
 	let {
@@ -18,48 +20,24 @@
 
 	function removeHighlight(index: number) {
 		data.highlights.splice(index, 1);
-		selectedHighlightIndex =
-			data.highlights.length === 0
-				? -1
-				: selectedHighlightIndex === index
-					? Math.min(index, data.highlights.length - 1)
-					: selectedHighlightIndex > index
-						? selectedHighlightIndex - 1
-						: selectedHighlightIndex;
-	}
-
-	function highlightNumber(index: number) {
-		return ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'][index] ?? `${index + 1}`;
+		selectedHighlightIndex = selectedIndexAfterRemoval(
+			selectedHighlightIndex,
+			index,
+			data.highlights.length
+		);
 	}
 </script>
 
 <section class="cv-editor-section">
 	<h2>Commercial impact</h2>
 	<label class="cv-editor-field">Section title <input bind:value={data.title} /></label>
-	<div class="cv-editor-item-nav" role="group" aria-label="Commercial impact highlights">
-		{#each data.highlights as highlight, index (index)}
-			<button
-				class="cv-editor-item-button"
-				class:active={selectedHighlightIndex === index}
-				type="button"
-				aria-label={`Edit highlight ${index + 1}`}
-				aria-pressed={selectedHighlightIndex === index}
-				title={`Highlight ${index + 1}: ${highlight.replaceAll('##', '')}`}
-				onclick={() => (selectedHighlightIndex = index)}
-			>
-				<span aria-hidden="true">{highlightNumber(index)}</span>
-			</button>
-		{/each}
-		<button
-			class="cv-editor-item-button"
-			type="button"
-			aria-label="Add highlight"
-			title="Add highlight"
-			onclick={addHighlight}
-		>
-			<span aria-hidden="true">➕</span>
-		</button>
-	</div>
+	<ItemSelector
+		items={data.highlights}
+		bind:selectedIndex={selectedHighlightIndex}
+		itemLabel="highlight"
+		ariaLabel="Commercial impact highlights"
+		onAdd={addHighlight}
+	/>
 	{#if selectedHighlightIndex >= 0}
 		<HighlightEditor
 			bind:highlight={data.highlights[selectedHighlightIndex]}

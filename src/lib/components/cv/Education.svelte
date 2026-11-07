@@ -1,4 +1,5 @@
 <script lang="ts">
+	import FatText from '#lib/components/cv/FatText.svelte';
 	import type { Education } from '#lib/types/cv.js';
 
 	let { data }: { data: Education } = $props();
@@ -18,7 +19,7 @@
 				<span class="dash"></span>
 				<span>{entry.location}</span>
 			</h4>
-			<p>Specialization: {entry.specialization}</p>
+			<p>Specialization: <FatText text={entry.specialization} /></p>
 		</div>
 	{/each}
 </section>

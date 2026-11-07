@@ -1,5 +1,5 @@
 <script lang="ts">
-	import RichText from '#lib/components/cv/RichText.svelte';
+	import FatText from '#lib/components/cv/FatText.svelte';
 	import type { Experience } from '#lib/types/cv.js';
 
 	let { data }: { data: Experience } = $props();
@@ -24,9 +24,9 @@
 				{#each job.bullets as bullet, bulletIndex (bulletIndex)}
 					<li>
 						{#if 'paragraph' in bullet && bullet.paragraph}
-							<p><RichText segments={bullet.content} /></p>
+							<p><FatText text={bullet.content} /></p>
 						{:else}
-							<RichText segments={bullet.content} />
+							<FatText text={bullet.content} />
 						{/if}
 					</li>
 				{/each}

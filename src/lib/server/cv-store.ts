@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import defaults from '#lib/data/cv/defaults.js';
+import { stringifyFatText } from '#lib/fat-text.js';
 import type { CvData, CvSection, TextSegment } from '#lib/types/cv.js';
 
 const dataDirectory = resolve(process.cwd(), 'data', 'cv');
@@ -42,20 +43,30 @@ function normalizeCommercialImpact(value: unknown): unknown {
 	if (typeof value.title === 'string' && value.highlights.every(isTextSegmentArray)) {
 		return {
 			...value,
-			highlights: value.highlights.map((highlight) =>
-				highlight
-					.map((segment) =>
-						typeof segment === 'string'
-							? segment
-							: segment.strong
-								? `##${segment.text}##`
-								: segment.text
-					)
-					.join('')
-			)
+			highlights: value.highlights.map(stringifyFatText)
 		};
 	}
 	return value;
+}
+
+function normalizeExperience(value: unknown): unknown {
+	if (!isRecord(value) || !Array.isArray(value.jobs)) return value;
+	return {
+		...value,
+		jobs: value.jobs.map((job) => {
+			if (!isRecord(job) || !Array.isArray(job.bullets)) return job;
+			return {
+				...job,
+				bullets: job.bullets.map((bullet) => {
+					if (!isRecord(bullet) || !isTextSegmentArray(bullet.content)) return bullet;
+					return {
+						...bullet,
+						content: stringifyFatText(bullet.content)
+					};
+				})
+			};
+		})
+	};
 }
 
 export function isCvSection(value: string): value is CvSection {
@@ -99,7 +110,7 @@ export function isCvSectionData(section: CvSection, value: unknown): boolean {
 						job.bullets.every(
 							(bullet) =>
 								isRecord(bullet) &&
-								isTextSegmentArray(bullet.content) &&
+								typeof bullet.content === 'string' &&
 								(bullet.paragraph === undefined || typeof bullet.paragraph === 'boolean')
 						)
 				)
@@ -140,7 +151,12 @@ async function readSection<K extends CvSection>(section: K): Promise<CvData[K]> 
 	}
 
 	const parsed: unknown = JSON.parse(serialized);
-	const value = section === 'commercialImpact' ? normalizeCommercialImpact(parsed) : parsed;
+	const value =
+		section === 'commercialImpact'
+			? normalizeCommercialImpact(parsed)
+			: section === 'experience'
+				? normalizeExperience(parsed)
+				: parsed;
 	if (!isCvSectionData(section, value)) {
 		throw new Error(`Invalid CV data in ${filePath}`);
 	}
