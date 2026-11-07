@@ -56,10 +56,10 @@
 		>Add note</button
 	>
 	<h3>Links</h3>
-	<div class="cv-editor-link-nav" role="group" aria-label="Header links">
+	<div class="cv-editor-item-nav" role="group" aria-label="Header links">
 		{#each data.links as link, index (index)}
 			<button
-				class="cv-editor-link-button"
+				class="cv-editor-item-button"
 				class:active={selectedLinkIndex === index}
 				type="button"
 				aria-label={`Edit link ${index + 1}${link.label ? `: ${link.label}` : ''}`}
@@ -71,7 +71,7 @@
 			</button>
 		{/each}
 		<button
-			class="cv-editor-link-button"
+			class="cv-editor-item-button"
 			type="button"
 			aria-label="Add link"
 			title="Add link"

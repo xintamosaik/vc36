@@ -90,13 +90,13 @@
 		margin: 0;
 	}
 
-	.cv-editor-link-nav {
+	.cv-editor-item-nav {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.5rem;
 	}
 
-	.cv-editor-link-button {
+	.cv-editor-item-button {
 		display: grid;
 		width: 3.25rem;
 		aspect-ratio: 1;
@@ -111,16 +111,16 @@
 		font-size: 1.25rem;
 	}
 
-	.cv-editor-link-button:hover {
+	.cv-editor-item-button:hover {
 		background: #41423e;
 	}
 
-	.cv-editor-link-button:focus-visible {
+	.cv-editor-item-button:focus-visible {
 		outline: 2px solid #b4cbe6;
 		outline-offset: 2px;
 	}
 
-	.cv-editor-link-button.active {
+	.cv-editor-item-button.active {
 		border-color: #9ab5d6;
 		background: #39495b;
 		color: #fff;
