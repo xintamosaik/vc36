@@ -90,6 +90,42 @@
 		margin: 0;
 	}
 
+	.cv-editor-link-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.cv-editor-link-button {
+		display: grid;
+		width: 3.25rem;
+		aspect-ratio: 1;
+		place-items: center;
+		cursor: pointer;
+		border: 1px solid #575751;
+		border-radius: 0.5rem;
+		background: #292a28;
+		padding: 0.25rem;
+		color: #deddd7;
+		font: inherit;
+		font-size: 1.25rem;
+	}
+
+	.cv-editor-link-button:hover {
+		background: #41423e;
+	}
+
+	.cv-editor-link-button:focus-visible {
+		outline: 2px solid #b4cbe6;
+		outline-offset: 2px;
+	}
+
+	.cv-editor-link-button.active {
+		border-color: #9ab5d6;
+		background: #39495b;
+		color: #fff;
+	}
+
 	.cv-editor-entry {
 		display: grid;
 		gap: 0.75rem;

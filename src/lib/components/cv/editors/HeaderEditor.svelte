@@ -3,6 +3,28 @@
 	import type { CvHeader } from '#lib/types/cv.js';
 
 	let { data = $bindable(), onSave }: { data: CvHeader; onSave: () => void } = $props();
+	let selectedLinkIndex = $state(data.links.length > 0 ? 0 : -1);
+
+	function addLink() {
+		data.links.push({ label: '', href: '' });
+		selectedLinkIndex = data.links.length - 1;
+	}
+
+	function removeLink(index: number) {
+		data.links.splice(index, 1);
+		selectedLinkIndex =
+			data.links.length === 0
+				? -1
+				: selectedLinkIndex === index
+					? Math.min(index, data.links.length - 1)
+					: selectedLinkIndex > index
+						? selectedLinkIndex - 1
+						: selectedLinkIndex;
+	}
+
+	function linkNumber(index: number) {
+		return ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'][index] ?? `${index + 1}`;
+	}
 </script>
 
 <section class="cv-editor-section">
@@ -34,18 +56,37 @@
 		>Add note</button
 	>
 	<h3>Links</h3>
-	{#each data.links as link, index (index)}
-		<HeaderLinkEditor
-			bind:link={data.links[index]}
-			onRemove={() => data.links.splice(data.links.indexOf(link), 1)}
-		/>
-	{/each}
-	<div class="cv-editor-actions">
+	<div class="cv-editor-link-nav" role="group" aria-label="Header links">
+		{#each data.links as link, index (index)}
+			<button
+				class="cv-editor-link-button"
+				class:active={selectedLinkIndex === index}
+				type="button"
+				aria-label={`Edit link ${index + 1}${link.label ? `: ${link.label}` : ''}`}
+				aria-pressed={selectedLinkIndex === index}
+				title={link.label || `Link ${index + 1}`}
+				onclick={() => (selectedLinkIndex = index)}
+			>
+				<span aria-hidden="true">{linkNumber(index)}</span>
+			</button>
+		{/each}
 		<button
-			class="cv-editor-button"
+			class="cv-editor-link-button"
 			type="button"
-			onclick={() => data.links.push({ label: '', href: '' })}>Add link</button
+			aria-label="Add link"
+			title="Add link"
+			onclick={addLink}
 		>
+			<span aria-hidden="true">➕</span>
+		</button>
+	</div>
+	{#if selectedLinkIndex >= 0}
+		<HeaderLinkEditor
+			bind:link={data.links[selectedLinkIndex]}
+			onRemove={() => removeLink(selectedLinkIndex)}
+		/>
+	{/if}
+	<div class="cv-editor-actions">
 		<button class="cv-editor-button cv-editor-button-primary" type="button" onclick={onSave}
 			>Save header</button
 		>
