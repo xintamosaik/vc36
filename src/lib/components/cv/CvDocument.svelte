@@ -6,13 +6,16 @@
 	import Experience from '#lib/components/cv/Experience.svelte';
 	import Skills from '#lib/components/cv/Skills.svelte';
 	import Summary from '#lib/components/cv/Summary.svelte';
+	import type { CvData } from '#lib/types/cv.js';
+
+	let { data }: { data: CvData } = $props();
 </script>
 
 <main class="cv-document">
-	<CvHeader />
-	<CommercialImpact />
-	<Summary />
-	<Experience />
-	<Skills />
-	<Education />
+	<CvHeader data={data.header} />
+	<CommercialImpact data={data.commercialImpact} />
+	<Summary data={data.summary} />
+	<Experience data={data.experience} />
+	<Skills data={data.skills} />
+	<Education data={data.education} />
 </main>

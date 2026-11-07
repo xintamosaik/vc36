@@ -1,5 +1,7 @@
 <script lang="ts">
-	import data from '#lib/data/cv/header.json';
+	import type { CvHeader } from '#lib/types/cv.js';
+
+	let { data }: { data: CvHeader } = $props();
 </script>
 
 <section id="title">
@@ -18,7 +20,7 @@
 
 <section class="contact">
 	<p>
-		{#each data.relocation as item, index}
+		{#each data.relocation as item, index (index)}
 			{#if index > 0}<span class="dash"></span>{/if}
 			<span>{item}</span>
 		{/each}
@@ -27,13 +29,13 @@
 
 <section class="contact">
 	<p>
-		{#each data.links as link, index}
+		{#each data.links as link, index (index)}
 			{#if index > 0}<span class="dash"></span>{/if}
 			<span>
 				<a
 					href={link.href}
 					target={link.targetBlank ? '_blank' : undefined}
-					rel={link.targetBlank ? 'noreferrer' : undefined}>{link.label}</a
+					rel="external noreferrer">{link.label}</a
 				>
 			</span>
 		{/each}

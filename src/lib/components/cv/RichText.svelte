@@ -1,10 +1,10 @@
 <script lang="ts">
-	type TextSegment = string | { text: string; strong?: boolean };
+	import type { TextSegment } from '#lib/types/cv.js';
 
 	let { segments }: { segments: TextSegment[] } = $props();
 </script>
 
-{#each segments as segment}
+{#each segments as segment, index (index)}
 	{#if typeof segment === 'string'}
 		{segment}
 	{:else if segment.strong}

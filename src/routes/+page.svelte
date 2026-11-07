@@ -1,5 +1,54 @@
 <script lang="ts">
+	import '#lib/components/cv/editors/editor.css';
 	import CvDocument from '#lib/components/cv/CvDocument.svelte';
+	import HeaderEditor from '#lib/components/cv/editors/HeaderEditor.svelte';
+	import CommercialImpactEditor from '#lib/components/cv/editors/CommercialImpactEditor.svelte';
+	import SummaryEditor from '#lib/components/cv/editors/SummaryEditor.svelte';
+	import ExperienceEditor from '#lib/components/cv/editors/ExperienceEditor.svelte';
+	import SkillsEditor from '#lib/components/cv/editors/SkillsEditor.svelte';
+	import EducationEditor from '#lib/components/cv/editors/EducationEditor.svelte';
+	import defaults from '#lib/data/cv/defaults.js';
+	import { resolve } from '$app/paths';
+	import { onMount } from 'svelte';
+	import type { CvData, CvSection } from '#lib/types/cv.js';
+
+	let cv = $state<CvData>(structuredClone(defaults));
+	let isLoading = $state(true);
+	let loadError = $state('');
+	let saveMessage = $state('');
+	let saveError = $state('');
+
+	onMount(async () => {
+		try {
+			const response = await fetch('/api/cv');
+			if (!response.ok) throw new Error(`Loading CV data failed (${response.status})`);
+			cv = await response.json();
+		} catch (cause) {
+			loadError = cause instanceof Error ? cause.message : 'Could not load CV data';
+		} finally {
+			isLoading = false;
+		}
+	});
+
+	async function saveSection(section: CvSection) {
+		saveMessage = '';
+		saveError = '';
+
+		try {
+			const response = await fetch(`/api/cv/${section}`, {
+				method: 'PUT',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify(cv[section])
+			});
+			if (!response.ok) {
+				const result: { message?: string } = await response.json();
+				throw new Error(result.message ?? `Saving ${section} failed (${response.status})`);
+			}
+			saveMessage = `${section} saved`;
+		} catch (cause) {
+			saveError = cause instanceof Error ? cause.message : 'Could not save CV data';
+		}
+	}
 </script>
 
 <svelte:head>
@@ -9,14 +58,36 @@
 <div
 	class="cv-workspace mx-auto grid min-h-screen w-full grid-cols-1 items-start justify-center gap-8 px-4 py-6 min-[1200px]:w-fit min-[1200px]:grid-cols-[60ch_60ch] min-[1200px]:px-0"
 >
-	<aside class="cv-tools w-full max-w-[75ch]">Buttons to come</aside>
+	<aside class="cv-tools w-full max-w-[75ch] space-y-6">
+		{#if isLoading}
+			<p role="status">Loading saved CV data…</p>
+		{:else if loadError}
+			<p class="text-sm text-red-300" role="alert">{loadError}. Refresh the page to try again.</p>
+		{:else}
+			{#if saveMessage}
+				<p class="text-sm text-green-300" role="status">{saveMessage}</p>
+			{/if}
+			{#if saveError}
+				<p class="text-sm text-red-300" role="alert">{saveError}</p>
+			{/if}
+			<HeaderEditor bind:data={cv.header} onSave={() => saveSection('header')} />
+			<CommercialImpactEditor
+				bind:data={cv.commercialImpact}
+				onSave={() => saveSection('commercialImpact')}
+			/>
+			<SummaryEditor bind:data={cv.summary} onSave={() => saveSection('summary')} />
+			<ExperienceEditor bind:data={cv.experience} onSave={() => saveSection('experience')} />
+			<SkillsEditor bind:data={cv.skills} onSave={() => saveSection('skills')} />
+			<EducationEditor bind:data={cv.education} onSave={() => saveSection('education')} />
+		{/if}
+	</aside>
 	<section class="cv-preview w-full max-w-[75ch]">
 		<div class="mb-4">
 			<a
 				class="inline-block rounded border border-[#aaa] px-3 py-2 no-underline hover:bg-white/10"
-				href="/print-preview">Open print preview</a
+				href={resolve('/print-preview')}>Open print preview</a
 			>
 		</div>
-		<CvDocument />
+		<CvDocument data={cv} />
 	</section>
 </div>

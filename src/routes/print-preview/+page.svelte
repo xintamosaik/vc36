@@ -1,6 +1,9 @@
 <script lang="ts">
 	import CvDocument from '#lib/components/cv/CvDocument.svelte';
 	import PrintPreview from '#lib/components/cv/PrintPreview.svelte';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
 </script>
 
 <svelte:head>
@@ -9,5 +12,5 @@
 
 <div class="mx-auto w-full max-w-[75ch] px-4 py-6">
 	<PrintPreview />
-	<CvDocument />
+	<CvDocument data={data.cv} />
 </div>

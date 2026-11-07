@@ -43,6 +43,8 @@ npm run dev
 npm run dev -- --open
 ```
 
+The CV editor loads its initial content from `src/lib/data/cv` and saves edits as JSON files in `data/cv` at the project root. The `data/cv` folder is created on the first save and can be version-controlled or synced with Git. The save API only accepts requests from the local machine; run the app locally rather than exposing it to a network.
+
 ## Building
 
 To create a production version of your app:

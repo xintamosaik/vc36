@@ -1,0 +1,19 @@
+<script lang="ts">
+	let {
+		paragraph = $bindable(),
+		onRemove
+	}: {
+		paragraph: string;
+		onRemove: () => void;
+	} = $props();
+</script>
+
+<div class="cv-editor-entry">
+	<label class="cv-editor-field">
+		Paragraph
+		<textarea bind:value={paragraph}></textarea>
+	</label>
+	<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
+		>Remove paragraph</button
+	>
+</div>

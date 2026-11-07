@@ -1,11 +1,13 @@
 <script lang="ts">
-	import data from '#lib/data/cv/experience.json';
 	import RichText from '#lib/components/cv/RichText.svelte';
+	import type { Experience } from '#lib/types/cv.js';
+
+	let { data }: { data: Experience } = $props();
 </script>
 
 <section id="experience">
 	<h2>{data.title}</h2>
-	{#each data.jobs as job}
+	{#each data.jobs as job, jobIndex (jobIndex)}
 		<div class="job entry">
 			<h3>
 				<span>{job.role}</span>
@@ -19,7 +21,7 @@
 			</h4>
 
 			<ul>
-				{#each job.bullets as bullet}
+				{#each job.bullets as bullet, bulletIndex (bulletIndex)}
 					<li>
 						{#if 'paragraph' in bullet && bullet.paragraph}
 							<p><RichText segments={bullet.content} /></p>
