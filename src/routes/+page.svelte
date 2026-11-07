@@ -6,8 +6,8 @@
 	import ExperienceEditor from '#lib/components/cv/editors/ExperienceEditor.svelte';
 	import SkillsEditor from '#lib/components/cv/editors/SkillsEditor.svelte';
 	import EducationEditor from '#lib/components/cv/editors/EducationEditor.svelte';
+	import WorkspaceNavigation from '#lib/components/cv/WorkspaceNavigation.svelte';
 	import defaults from '#lib/data/cv/defaults.js';
-	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import type { CvData, CvSection } from '#lib/types/cv.js';
 
@@ -95,12 +95,7 @@
 </svelte:head>
 
 <main class="cv-workspace mx-auto min-h-screen w-full max-w-[75ch] px-4 py-6">
-	<div class="mb-6">
-		<a
-			class="inline-block rounded border border-[#aaa] px-3 py-2 no-underline hover:bg-white/10"
-			href={resolve('/print-preview')}>Open print preview</a
-		>
-	</div>
+	<WorkspaceNavigation active="editor" />
 	<section class="cv-tools space-y-6" aria-label="CV editor">
 		{#if isLoading}
 			<p role="status">Loading saved CV data…</p>

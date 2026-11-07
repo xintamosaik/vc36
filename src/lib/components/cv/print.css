@@ -7,6 +7,10 @@
 		display: none;
 	}
 
+	.workspace-nav {
+		display: none;
+	}
+
 	@scope (main.cv-document) {
 		:scope {
 			line-height: normal;
