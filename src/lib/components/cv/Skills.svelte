@@ -1,18 +1,12 @@
+<script lang="ts">
+	import data from '#lib/data/cv/skills.json';
+</script>
+
 <section>
-	<h2>Skills</h2>
+	<h2>{data.title}</h2>
 	<ul>
-		<li>
-			<strong>Core Stack:</strong> TypeScript, JavaScript (ES6+), React, Vue, Node.js (Fastify)
-		</li>
-		<li>
-			<strong>Infrastructure &amp; DevOps:</strong> Docker, Kubernetes, GitHub Actions, GitLab CI, AWS,
-			GCP
-		</li>
-		<li>
-			<strong>Data &amp; Storage:</strong> MongoDB, SQL (MySQL/PostgreSQL), ORM
-		</li>
-		<li>
-			<strong>Tooling &amp; Quality:</strong> ESLint, JSDoc, TDD/BDD, CI/CD, DevOps practices
-		</li>
+		{#each data.skills as skill}
+			<li><strong>{skill.label}:</strong> {skill.value}</li>
+		{/each}
 	</ul>
 </section>

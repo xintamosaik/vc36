@@ -1,0 +1,151 @@
+{
+	"title": "Experience",
+	"jobs": [
+		{
+			"role": "Software Engineer",
+			"company": "iq digital media marketing gmbh",
+			"dates": "Jan 2024 - May 2025",
+			"location": "Düsseldorf, Germany",
+			"bullets": [
+				{
+					"paragraph": true,
+					"content": [
+						{
+							"text": "Reverse-engineered and replaced a 5,000-line legacy AdController",
+							"strong": true
+						},
+						" with a ~60-line config-driven core — restored control over deployment, removed reliance on third-party TMS, enabled versioning, and laid the foundation for CI/CD and TypeScript-based development across ad tech infrastructure."
+					]
+				},
+				{
+					"paragraph": true,
+					"content": [
+						{ "text": "Built the SkyMover system", "strong": true },
+						" to unify ad positioning logic across 40+ client websites — replaced hundreds of scattered, error-prone layout scripts with a 100-line JS module, significantly reducing integration time per client and lowering ongoing maintenance overhead across 40+ revenue-generating websites."
+					]
+				},
+				{
+					"paragraph": true,
+					"content": [
+						{ "text": "Architected and delivered a modern ad template builder", "strong": true },
+						" using TypeScript and esbuild — replaced a fragile, manual system with import/export support, modular design, and a local test environment. Reduced feedback loop time from 3–5 minutes to under 1 second, enabling rapid iteration and future testing capabilities."
+					]
+				},
+				{
+					"paragraph": true,
+					"content": [
+						{ "text": "Created internal DX tools", "strong": true },
+						" including a test harness for templates, a URL builder to streamline QA workflows, and macro validation logic — significantly improved developer efficiency, reduced context-switching, and accelerated the migration of legacy templates."
+					]
+				},
+				{
+					"paragraph": true,
+					"content": [
+						{ "text": "Drove culture shift toward engineering best practices", "strong": true },
+						" by introducing TypeScript, ESLint, JSdoc, domain-based folder structures, and fast-feedback mindsets. Mentored junior teammates, led pair programming efforts, and helped reshape quality habits within a historically chaotic delivery environment."
+					]
+				},
+				{
+					"paragraph": true,
+					"content": [
+						{ "text": "Supported development of a Chrome extension", "strong": true },
+						" for PM and stakeholder visibility into ad setup status — contributed React and Chrome API guidance, improving internal transparency around campaign configuration."
+					]
+				}
+			]
+		},
+		{
+			"role": "Software Engineer",
+			"company": "aufinity Group GmbH",
+			"dates": "Sep 2025 - Now",
+			"location": "Cologne, Germany",
+			"bullets": [
+				{
+					"content": [
+						"Delivered production changes across a Dockerised microservice platform using Vue, Fastify, MongoDB, Redis, and Kubernetes."
+					]
+				},
+				{
+					"content": [
+						"Developed and maintained frontend and backend services within a proprietary internal framework used across multiple services."
+					]
+				},
+				{
+					"content": [
+						"Reached full delivery velocity within weeks by quickly understanding the internal framework, service boundaries, and deployment workflow."
+					]
+				},
+				{
+					"content": [
+						"Implemented unit and integration tests in a JSDoc-typed JavaScript environment, improving confidence in service changes."
+					]
+				},
+				{
+					"content": [
+						"Contributed to containerised release workflows and Kubernetes-based deployments supporting reliable production delivery."
+					]
+				}
+			]
+		},
+		{
+			"role": "Full Stack Developer",
+			"company": "Qanuk GmbH",
+			"dates": "April 2021 - December 2023",
+			"location": "Osnabrück, Niedersachsen, Germany",
+			"bullets": [
+				{
+					"content": [
+						{ "text": "Rebuilt an 8,000+ line legacy invoicing system", "strong": true },
+						" into a modular WordPress plugin (q_invoice) using MVC architecture, domain/feature slicing, AJAX-based UX, and modern PHP practices. Achieved full feature parity in ~7 months, introduced multi-language support, custom tax handling, import/export logic, and reduced friction for business stakeholders through faster, dynamic interfaces."
+					]
+				},
+				{
+					"content": [
+						{
+							"text": "Designed and implemented a flexible internal reporting system",
+							"strong": true
+						},
+						" (PHP + Chart.js) that enabled visual filtering across event types, cities, and date ranges — a key decision-making tool praised by the CEO for its usability and depth. Architected for extensibility, with lazy AJAX rendering and data-driven config logic."
+					]
+				},
+				{
+					"content": [
+						{ "text": "Reduced noise and instability in the admin panel", "strong": true },
+						" by fixing 50–70 recurring PHP bugs and cleaning up thousands of warnings. Introduced a lightweight logging system with trace capabilities, restoring error log usability and giving the team visibility into regressions."
+					]
+				},
+				{
+					"content": [
+						{ "text": "Refactored scattered legacy code", "strong": true },
+						" (PHP/JS) into modular components with clear boundaries — cutting bug rates by ~40% in key workflows and improving overall developer confidence and responsiveness."
+					]
+				},
+				{
+					"content": [
+						{ "text": "Took initiative to drive peer mentoring", "strong": true },
+						" and code quality practices in a chaotic, process-light environment: introduced Discord-based pair programming sessions, launched informal review habits, and promoted better naming, structure, and JS/PHP linting across the team."
+					]
+				},
+				{
+					"content": [
+						{
+							"text": "Introduced WP_React, JSdoc, ESLint, and static PHP analysis tools",
+							"strong": true
+						},
+						" to strengthen reliability and readability. Drove early Docker adoption to enable testability, though the team was not yet ready for full TDD."
+					]
+				},
+				{
+					"content": [
+						"Used Postman for API development, Adminer for SQL analysis, and ",
+						{
+							"text": "proactively learned unfamiliar tooling to support architectural improvements",
+							"strong": true
+						},
+						" on the fly."
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,17 +1,22 @@
-<section>
-	<h2>Education</h2>
+<script lang="ts">
+	import data from '#lib/data/cv/education.json';
+</script>
 
-	<div class="education entry">
-		<h3>
-			<span>Master of Arts in Sociology</span>
-			<span class="dash"></span>
-			<span>Universität Bielefeld</span>
-		</h3>
-		<h4>
-			<span>September 2021</span>
-			<span class="dash"></span>
-			<span>Bielefeld, NRW, Germany</span>
-		</h4>
-		<p>Specialization: Qualitative Studies and Workplace Studies/Ethnomethodology</p>
-	</div>
+<section>
+	<h2>{data.title}</h2>
+	{#each data.entries as entry}
+		<div class="education entry">
+			<h3>
+				<span>{entry.qualification}</span>
+				<span class="dash"></span>
+				<span>{entry.institution}</span>
+			</h3>
+			<h4>
+				<span>{entry.date}</span>
+				<span class="dash"></span>
+				<span>{entry.location}</span>
+			</h4>
+			<p>Specialization: {entry.specialization}</p>
+		</div>
+	{/each}
 </section>

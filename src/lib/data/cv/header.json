@@ -1,0 +1,19 @@
+{
+	"name": "Ulf Dellbrügge",
+	"role": "SOFTWARE ENGINEER (FULL-STACK / TYPESCRIPT)",
+	"subtitle": "Full-stack software engineer building reliable TypeScript, frontend, and backend systems",
+	"relocation": ["Relocating to London (Skilled Worker visa route)", "Open to sponsorship"],
+	"links": [
+		{
+			"label": "LinkedIn",
+			"href": "https://www.linkedin.com/in/ulfdellbruegge/",
+			"targetBlank": true
+		},
+		{ "label": "ulfdellbruegge@gmail.com", "href": "mailto:ulfdellbruegge@gmail.com" },
+		{
+			"label": "github.com/xintamosaik",
+			"href": "https://github.com/xintamosaik",
+			"targetBlank": true
+		}
+	]
+}

@@ -1,0 +1,15 @@
+{
+	"title": "Skills",
+	"skills": [
+		{
+			"label": "Core Stack",
+			"value": "TypeScript, JavaScript (ES6+), React, Vue, Node.js (Fastify)"
+		},
+		{
+			"label": "Infrastructure & DevOps",
+			"value": "Docker, Kubernetes, GitHub Actions, GitLab CI, AWS, GCP"
+		},
+		{ "label": "Data & Storage", "value": "MongoDB, SQL (MySQL/PostgreSQL), ORM" },
+		{ "label": "Tooling & Quality", "value": "ESLint, JSDoc, TDD/BDD, CI/CD, DevOps practices" }
+	]
+}
