@@ -51,13 +51,43 @@
 		}
 	}
 
-	const sections: { id: CvSection; label: string }[] = [
-		{ id: 'header', label: 'Header & contact' },
-		{ id: 'commercialImpact', label: 'Commercial impact' },
-		{ id: 'summary', label: 'Summary' },
-		{ id: 'experience', label: 'Experience' },
-		{ id: 'skills', label: 'Skills' },
-		{ id: 'education', label: 'Education' }
+	const sections: { id: CvSection; label: string; emoji: string; description: string }[] = [
+		{
+			id: 'header',
+			label: 'Header & contact',
+			emoji: '👤',
+			description: 'Edit your name, role, intro, relocation note, and contact links.'
+		},
+		{
+			id: 'commercialImpact',
+			label: 'Commercial impact',
+			emoji: '📈',
+			description: 'Highlight measurable outcomes and business impact.'
+		},
+		{
+			id: 'summary',
+			label: 'Summary',
+			emoji: '📝',
+			description: 'Edit the short professional overview at the top of your CV.'
+		},
+		{
+			id: 'experience',
+			label: 'Experience',
+			emoji: '💼',
+			description: 'Manage roles, dates, locations, and achievement bullets.'
+		},
+		{
+			id: 'skills',
+			label: 'Skills',
+			emoji: '🧰',
+			description: 'Group and update your technical and professional skills.'
+		},
+		{
+			id: 'education',
+			label: 'Education',
+			emoji: '🎓',
+			description: 'Add or edit qualifications, institutions, and specializations.'
+		}
 	];
 </script>
 
@@ -81,12 +111,20 @@
 						class:active={selectedSection === section.id}
 						type="button"
 						aria-pressed={selectedSection === section.id}
+						aria-label={section.label}
+						aria-describedby={`${section.id}-description`}
+						title={section.description}
 						onclick={() => {
 							selectedSection = section.id;
 							saveMessage = '';
 							saveError = '';
-						}}>{section.label}</button
+						}}
 					>
+						<span class="cv-editor-nav-emoji" aria-hidden="true">{section.emoji}</span>
+						<span class="cv-editor-nav-tooltip" id={`${section.id}-description`} role="tooltip">
+							{section.description}
+						</span>
+					</button>
 				{/each}
 			</nav>
 			{#if saveMessage}

@@ -1,29 +1,73 @@
 @scope (.cv-tools) {
 	.cv-editor-nav {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.5rem;
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+		gap: 0.75rem;
 	}
 
 	.cv-editor-nav-button {
+		position: relative;
+		display: grid;
+		width: 100%;
+		aspect-ratio: 1;
+		place-items: center;
 		cursor: pointer;
 		border: 1px solid #575751;
-		border-radius: 0.375rem;
+		border-radius: 0.625rem;
 		background: #323330;
-		padding: 0.625rem 0.75rem;
+		padding: 0.25rem;
 		color: #deddd7;
 		font: inherit;
-		text-align: left;
 	}
 
 	.cv-editor-nav-button:hover {
 		background: #41423e;
 	}
 
+	.cv-editor-nav-button:focus-visible {
+		z-index: 1;
+		outline: 2px solid #b4cbe6;
+		outline-offset: 2px;
+	}
+
 	.cv-editor-nav-button.active {
 		border-color: #9ab5d6;
 		background: #39495b;
 		color: #fff;
+	}
+
+	.cv-editor-nav-emoji {
+		font-size: 1.75rem;
+		line-height: 1;
+	}
+
+	.cv-editor-nav-tooltip {
+		position: absolute;
+		z-index: 2;
+		top: calc(100% + 0.5rem);
+		left: 50%;
+		width: max-content;
+		max-width: min(18rem, 80vw);
+		border: 1px solid #696a64;
+		border-radius: 0.375rem;
+		background: #20211f;
+		padding: 0.5rem 0.625rem;
+		color: #f0eee7;
+		font-size: 0.8rem;
+		font-weight: 400;
+		line-height: 1.4;
+		text-align: left;
+		visibility: hidden;
+		opacity: 0;
+		pointer-events: none;
+		transform: translateX(-50%);
+		transition: opacity 120ms ease;
+	}
+
+	.cv-editor-nav-button:hover .cv-editor-nav-tooltip,
+	.cv-editor-nav-button:focus-visible .cv-editor-nav-tooltip {
+		visibility: visible;
+		opacity: 1;
 	}
 
 	.cv-editor-section {
