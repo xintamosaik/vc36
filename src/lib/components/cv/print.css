@@ -7,21 +7,6 @@
 		display: none;
 	}
 
-	.cv-tools {
-		display: none !important;
-	}
-
-	.cv-workspace {
-		display: block !important;
-		min-height: 0 !important;
-		padding: 0 !important;
-	}
-
-	.cv-preview {
-		width: auto !important;
-		max-width: none !important;
-	}
-
 	@scope (main.cv-document) {
 		:scope {
 			line-height: normal;

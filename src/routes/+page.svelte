@@ -1,6 +1,5 @@
 <script lang="ts">
 	import CvDocument from '#lib/components/cv/CvDocument.svelte';
-	import PrintPreview from '#lib/components/cv/PrintPreview.svelte';
 </script>
 
 <svelte:head>
@@ -12,7 +11,12 @@
 >
 	<aside class="cv-tools w-full max-w-[75ch]">Buttons to come</aside>
 	<section class="cv-preview w-full max-w-[75ch]">
-		<PrintPreview />
+		<div class="mb-4">
+			<a
+				class="inline-block rounded border border-[#aaa] px-3 py-2 no-underline hover:bg-white/10"
+				href="/print-preview">Open print preview</a
+			>
+		</div>
 		<CvDocument />
 	</section>
 </div>
