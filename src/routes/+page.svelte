@@ -13,6 +13,7 @@
 	import type { CvData, CvSection } from '#lib/types/cv.js';
 
 	let cv = $state<CvData>(structuredClone(defaults));
+	let selectedSection = $state<CvSection>('header');
 	let isLoading = $state(true);
 	let loadError = $state('');
 	let saveMessage = $state('');
@@ -49,6 +50,15 @@
 			saveError = cause instanceof Error ? cause.message : 'Could not save CV data';
 		}
 	}
+
+	const sections: { id: CvSection; label: string }[] = [
+		{ id: 'header', label: 'Header & contact' },
+		{ id: 'commercialImpact', label: 'Commercial impact' },
+		{ id: 'summary', label: 'Summary' },
+		{ id: 'experience', label: 'Experience' },
+		{ id: 'skills', label: 'Skills' },
+		{ id: 'education', label: 'Education' }
+	];
 </script>
 
 <svelte:head>
@@ -64,21 +74,43 @@
 		{:else if loadError}
 			<p class="text-sm text-red-300" role="alert">{loadError}. Refresh the page to try again.</p>
 		{:else}
+			<nav class="cv-editor-nav" aria-label="CV sections">
+				{#each sections as section (section.id)}
+					<button
+						class="cv-editor-nav-button"
+						class:active={selectedSection === section.id}
+						type="button"
+						aria-pressed={selectedSection === section.id}
+						onclick={() => {
+							selectedSection = section.id;
+							saveMessage = '';
+							saveError = '';
+						}}>{section.label}</button
+					>
+				{/each}
+			</nav>
 			{#if saveMessage}
 				<p class="text-sm text-green-300" role="status">{saveMessage}</p>
 			{/if}
 			{#if saveError}
 				<p class="text-sm text-red-300" role="alert">{saveError}</p>
 			{/if}
-			<HeaderEditor bind:data={cv.header} onSave={() => saveSection('header')} />
-			<CommercialImpactEditor
-				bind:data={cv.commercialImpact}
-				onSave={() => saveSection('commercialImpact')}
-			/>
-			<SummaryEditor bind:data={cv.summary} onSave={() => saveSection('summary')} />
-			<ExperienceEditor bind:data={cv.experience} onSave={() => saveSection('experience')} />
-			<SkillsEditor bind:data={cv.skills} onSave={() => saveSection('skills')} />
-			<EducationEditor bind:data={cv.education} onSave={() => saveSection('education')} />
+			{#if selectedSection === 'header'}
+				<HeaderEditor bind:data={cv.header} onSave={() => saveSection('header')} />
+			{:else if selectedSection === 'commercialImpact'}
+				<CommercialImpactEditor
+					bind:data={cv.commercialImpact}
+					onSave={() => saveSection('commercialImpact')}
+				/>
+			{:else if selectedSection === 'summary'}
+				<SummaryEditor bind:data={cv.summary} onSave={() => saveSection('summary')} />
+			{:else if selectedSection === 'experience'}
+				<ExperienceEditor bind:data={cv.experience} onSave={() => saveSection('experience')} />
+			{:else if selectedSection === 'skills'}
+				<SkillsEditor bind:data={cv.skills} onSave={() => saveSection('skills')} />
+			{:else}
+				<EducationEditor bind:data={cv.education} onSave={() => saveSection('education')} />
+			{/if}
 		{/if}
 	</aside>
 	<section class="cv-preview w-full max-w-[75ch]">

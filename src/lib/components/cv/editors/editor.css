@@ -1,4 +1,31 @@
 @scope (.cv-tools) {
+	.cv-editor-nav {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.5rem;
+	}
+
+	.cv-editor-nav-button {
+		cursor: pointer;
+		border: 1px solid #575751;
+		border-radius: 0.375rem;
+		background: #323330;
+		padding: 0.625rem 0.75rem;
+		color: #deddd7;
+		font: inherit;
+		text-align: left;
+	}
+
+	.cv-editor-nav-button:hover {
+		background: #41423e;
+	}
+
+	.cv-editor-nav-button.active {
+		border-color: #9ab5d6;
+		background: #39495b;
+		color: #fff;
+	}
+
 	.cv-editor-section {
 		padding: 1rem;
 		border: 1px solid #575751;
