@@ -13,7 +13,10 @@
 <div class="cv-editor-entry">
 	<label class="cv-editor-field">
 		Highlight
-		<textarea bind:value={highlight} placeholder="Wrap bold text in ##double hashes##"></textarea>
+		<textarea
+			class="cv-editor-field-long"
+			bind:value={highlight}
+			placeholder="Wrap bold text in ##double hashes##"></textarea>
 	</label>
 	<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
 		>Remove highlight</button

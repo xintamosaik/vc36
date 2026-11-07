@@ -22,8 +22,10 @@
 	</label>
 	<label class="cv-editor-field">
 		Bullet text
-		<textarea bind:value={bullet.content} placeholder="Wrap bold text in ##double hashes##"
-		></textarea>
+		<textarea
+			class="cv-editor-field-long"
+			bind:value={bullet.content}
+			placeholder="Wrap bold text in ##double hashes##"></textarea>
 	</label>
 	<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
 		>Remove bullet</button

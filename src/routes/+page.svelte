@@ -1,6 +1,5 @@
 <script lang="ts">
 	import '#lib/components/cv/editors/editor.css';
-	import CvDocument from '#lib/components/cv/CvDocument.svelte';
 	import HeaderEditor from '#lib/components/cv/editors/HeaderEditor.svelte';
 	import CommercialImpactEditor from '#lib/components/cv/editors/CommercialImpactEditor.svelte';
 	import SummaryEditor from '#lib/components/cv/editors/SummaryEditor.svelte';
@@ -95,10 +94,14 @@
 	<title>CV - Ulf Dellbrügge</title>
 </svelte:head>
 
-<div
-	class="cv-workspace mx-auto grid min-h-screen w-full grid-cols-1 items-start justify-center gap-8 px-4 py-6 min-[1200px]:w-fit min-[1200px]:grid-cols-[60ch_60ch] min-[1200px]:px-0"
->
-	<aside class="cv-tools w-full max-w-[75ch] space-y-6">
+<main class="cv-workspace mx-auto min-h-screen w-full max-w-[75ch] px-4 py-6">
+	<div class="mb-6">
+		<a
+			class="inline-block rounded border border-[#aaa] px-3 py-2 no-underline hover:bg-white/10"
+			href={resolve('/print-preview')}>Open print preview</a
+		>
+	</div>
+	<section class="cv-tools space-y-6" aria-label="CV editor">
 		{#if isLoading}
 			<p role="status">Loading saved CV data…</p>
 		{:else if loadError}
@@ -150,14 +153,5 @@
 				<EducationEditor bind:data={cv.education} onSave={() => saveSection('education')} />
 			{/if}
 		{/if}
-	</aside>
-	<section class="cv-preview w-full max-w-[75ch]">
-		<div class="mb-4">
-			<a
-				class="inline-block rounded border border-[#aaa] px-3 py-2 no-underline hover:bg-white/10"
-				href={resolve('/print-preview')}>Open print preview</a
-			>
-		</div>
-		<CvDocument data={cv} />
 	</section>
-</div>
+</main>

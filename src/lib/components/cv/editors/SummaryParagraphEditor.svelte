@@ -11,7 +11,10 @@
 <div class="cv-editor-entry">
 	<label class="cv-editor-field">
 		Paragraph
-		<textarea bind:value={paragraph} placeholder="Wrap bold text in ##double hashes##"></textarea>
+		<textarea
+			class="cv-editor-field-long"
+			bind:value={paragraph}
+			placeholder="Wrap bold text in ##double hashes##"></textarea>
 	</label>
 	<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
 		>Remove paragraph</button

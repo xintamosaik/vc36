@@ -14,7 +14,10 @@
 	<label class="cv-editor-field">Label <input bind:value={skill.label} /></label>
 	<label class="cv-editor-field">
 		Skills
-		<textarea bind:value={skill.value} placeholder="Wrap bold text in ##double hashes##"></textarea>
+		<textarea
+			class="cv-editor-field-long"
+			bind:value={skill.value}
+			placeholder="Wrap bold text in ##double hashes##"></textarea>
 	</label>
 	<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
 		>Remove skill group</button

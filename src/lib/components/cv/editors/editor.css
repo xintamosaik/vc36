@@ -157,6 +157,10 @@
 		resize: vertical;
 	}
 
+	.cv-editor-field textarea.cv-editor-field-long {
+		min-height: 12rem;
+	}
+
 	.cv-editor-actions {
 		display: flex;
 		flex-wrap: wrap;

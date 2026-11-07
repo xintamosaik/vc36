@@ -40,7 +40,7 @@
 	<label class="cv-editor-field">Role <input bind:value={data.role} /></label>
 	<label class="cv-editor-field">
 		Subtitle
-		<textarea bind:value={data.subtitle}></textarea>
+		<textarea class="cv-editor-field-long" bind:value={data.subtitle}></textarea>
 	</label>
 	<h3>Relocation notes</h3>
 	<ItemSelector
