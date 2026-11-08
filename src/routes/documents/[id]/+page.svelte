@@ -2,12 +2,12 @@
 	import { resolve } from '$app/paths';
 	import WorkspaceNavigation from '#lib/components/cv/WorkspaceNavigation.svelte';
 	import '#lib/components/cv/editors/editor.css';
-	import type { CvSection, CvVariant, CvVariantSkillChange } from '#lib/types/cv.js';
+	import type { CvSection, CvVariant, ExperienceBullet } from '#lib/types/cv.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let selectedSection = $state<CvSection>('header');
 	// This is an editable local draft; route data remains unchanged until saved.
-	// eslint-disable-next-line svelte/prefer-writable-derived
 	let variant = $state<CvVariant>({
 		id: '',
 		name: '',
@@ -15,23 +15,56 @@
 		sectionTitles: {},
 		hiddenJobIds: [],
 		skillChanges: {},
-		addedSkills: []
+		addedSkills: [],
+		textOverrides: {}
 	});
 	let saveMessage = $state('');
 	let saveError = $state('');
 	let isSaving = $state(false);
 
 	$effect(() => {
-		variant = structuredClone(data.variant);
+		const nextVariant = structuredClone(data.variant);
+		nextVariant.textOverrides ??= {};
+		variant = nextVariant;
 	});
 
-	const sections: { id: CvSection; title: string }[] = [
-		{ id: 'header', title: 'Header & contact' },
-		{ id: 'commercialImpact', title: 'Commercial impact' },
-		{ id: 'summary', title: 'Summary' },
-		{ id: 'experience', title: 'Experience' },
-		{ id: 'skills', title: 'Skills' },
-		{ id: 'education', title: 'Education' }
+	const sections: { id: CvSection; label: string; emoji: string; description: string }[] = [
+		{
+			id: 'header',
+			label: 'Header & contact',
+			emoji: '👤',
+			description: 'Tailor your role and introduction; identity and contact facts stay read-only.'
+		},
+		{
+			id: 'commercialImpact',
+			label: 'Commercial impact',
+			emoji: '📈',
+			description: 'Review measurable outcomes and business impact.'
+		},
+		{
+			id: 'summary',
+			label: 'Summary',
+			emoji: '📝',
+			description: 'Tailor the professional overview for this CV variant.'
+		},
+		{
+			id: 'experience',
+			label: 'Experience',
+			emoji: '💼',
+			description: 'Review roles and tailor experience wording for this CV variant.'
+		},
+		{
+			id: 'skills',
+			label: 'Skills',
+			emoji: '🧰',
+			description: 'Review skills from the main CV; factual skill claims are read-only.'
+		},
+		{
+			id: 'education',
+			label: 'Education',
+			emoji: '🎓',
+			description: 'Review qualifications and education details from the main CV.'
+		}
 	];
 
 	function sectionHidden(id: CvSection): boolean {
@@ -62,12 +95,71 @@
 			: variant.hiddenJobIds.filter((jobId) => jobId !== id);
 	}
 
+	function updateHeaderText(key: 'headerRole' | 'headerSubtitle', value: string) {
+		variant.textOverrides = { ...variant.textOverrides, [key]: value };
+	}
+
 	function removeStaleJobOverride(id: string) {
 		variant.hiddenJobIds = variant.hiddenJobIds.filter((jobId) => jobId !== id);
 	}
 
-	function skillMode(id: string): 'inherit' | 'hidden' | 'replacement' {
-		return variant.skillChanges[id]?.kind ?? 'inherit';
+	function summaryParagraphs(): string[] {
+		return variant.textOverrides?.summaryParagraphs ?? data.cv.summary.paragraphs;
+	}
+
+	function updateSummaryParagraph(index: number, value: string) {
+		const paragraphs = [...summaryParagraphs()];
+		paragraphs[index] = value;
+		variant.textOverrides = { ...variant.textOverrides, summaryParagraphs: paragraphs };
+	}
+
+	function addSummaryParagraph() {
+		variant.textOverrides = {
+			...variant.textOverrides,
+			summaryParagraphs: [...summaryParagraphs(), '']
+		};
+	}
+
+	function removeSummaryParagraph(index: number) {
+		variant.textOverrides = {
+			...variant.textOverrides,
+			summaryParagraphs: summaryParagraphs().filter((_, paragraphIndex) => paragraphIndex !== index)
+		};
+	}
+
+	function experienceBullets(jobId: string): ExperienceBullet[] {
+		return (
+			variant.textOverrides?.experienceBullets?.[jobId] ??
+			data.cv.experience.jobs.find((job) => job.id === jobId)?.bullets ??
+			[]
+		);
+	}
+
+	function updateExperienceBullets(jobId: string, bullets: ExperienceBullet[]) {
+		variant.textOverrides = {
+			...variant.textOverrides,
+			experienceBullets: {
+				...variant.textOverrides?.experienceBullets,
+				[jobId]: bullets
+			}
+		};
+	}
+
+	function updateExperienceBullet(jobId: string, index: number, bullet: ExperienceBullet) {
+		const bullets = [...experienceBullets(jobId)];
+		bullets[index] = bullet;
+		updateExperienceBullets(jobId, bullets);
+	}
+
+	function addExperienceBullet(jobId: string) {
+		updateExperienceBullets(jobId, [...experienceBullets(jobId), { content: '' }]);
+	}
+
+	function removeExperienceBullet(jobId: string, index: number) {
+		updateExperienceBullets(
+			jobId,
+			experienceBullets(jobId).filter((_, bulletIndex) => bulletIndex !== index)
+		);
 	}
 
 	function removeStaleSkillOverride(id: string) {
@@ -76,49 +168,25 @@
 		variant.skillChanges = changes;
 	}
 
-	function setSkillMode(id: string, mode: string) {
-		if (mode === 'inherit') {
-			const changes = { ...variant.skillChanges };
-			delete changes[id];
-			variant.skillChanges = changes;
-		} else if (mode === 'hidden') {
-			variant.skillChanges = { ...variant.skillChanges, [id]: { kind: 'hidden' } };
-		} else {
-			const original = data.cv.skills.skills.find((skill) => skill.id === id);
-			if (!original) return;
-			variant.skillChanges = {
-				...variant.skillChanges,
-				[id]: {
-					kind: 'replacement',
-					label: original.label,
-					value: original.value
-				}
-			};
-		}
-	}
-
-	function skillReplacement(id: string): Extract<CvVariantSkillChange, { kind: 'replacement' }> {
+	function skillLabel(id: string, label: string): string {
 		const change = variant.skillChanges[id];
-		if (change?.kind === 'replacement') return change;
-		const original = data.cv.skills.skills.find((skill) => skill.id === id);
-		return { kind: 'replacement', label: original?.label ?? '', value: original?.value ?? '' };
+		return change?.kind === 'replacement' ? change.label : label;
 	}
 
-	function updateSkillReplacement(id: string, key: 'label' | 'value', value: string) {
-		const replacement = skillReplacement(id);
-		variant.skillChanges = {
-			...variant.skillChanges,
-			[id]: { ...replacement, [key]: value }
-		};
+	function skillValue(id: string, value: string): string {
+		const change = variant.skillChanges[id];
+		return change?.kind === 'replacement' ? change.value : value;
 	}
 
-	function addSkill() {
-		variant.addedSkills.push({ id: crypto.randomUUID(), label: '', value: '' });
-		variant.addedSkills = [...variant.addedSkills];
+	function skillHidden(id: string): boolean {
+		return variant.skillChanges[id]?.kind === 'hidden';
 	}
 
-	function removeSkill(id: string) {
-		variant.addedSkills = variant.addedSkills.filter((skill) => skill.id !== id);
+	function setSkillHidden(id: string, hidden: boolean) {
+		const changes = { ...variant.skillChanges };
+		if (hidden) changes[id] = { kind: 'hidden' };
+		else if (changes[id]?.kind === 'hidden') delete changes[id];
+		variant.skillChanges = changes;
 	}
 
 	async function saveVariant() {
@@ -167,125 +235,275 @@
 	<section class="cv-tools space-y-6" aria-label="CV variant editor">
 		<section class="cv-editor-section">
 			<h2>Edit CV variant</h2>
-			<p>Unchanged content inherits from the main CV. Overrides stay with this variant.</p>
+			<p>
+				Factual details inherit from the main CV and are read-only. You can tailor the summary and
+				experience wording for this variant.
+			</p>
 			<label class="cv-editor-field">
 				Name <input bind:value={variant.name} required maxlength="100" />
 			</label>
 		</section>
 
-		<section class="cv-editor-section">
-			<h2>Sections</h2>
+		<nav class="cv-editor-nav" aria-label="CV sections">
 			{#each sections as section (section.id)}
-				<div class="cv-editor-entry">
-					<label class="cv-editor-checkbox">
-						<input
-							type="checkbox"
-							checked={!sectionHidden(section.id)}
-							onchange={(event) => setSectionHidden(section.id, !event.currentTarget.checked)}
-						/>
-						Show {section.title}
-					</label>
-					{#if section.id !== 'header'}
-						<label class="cv-editor-field">
-							Section title override
-							<input
-								value={variant.sectionTitles[section.id] ?? ''}
-								placeholder={data.cv[section.id].title}
-								disabled={sectionHidden(section.id)}
-								oninput={(event) => updateSectionTitle(section.id, event.currentTarget.value)}
-							/>
-						</label>
-					{/if}
-				</div>
+				<button
+					class="cv-editor-nav-button"
+					class:active={selectedSection === section.id}
+					type="button"
+					aria-pressed={selectedSection === section.id}
+					aria-label={section.label}
+					aria-describedby={`${section.id}-description`}
+					title={section.description}
+					onclick={() => (selectedSection = section.id)}
+				>
+					<span class="cv-editor-nav-emoji" aria-hidden="true">{section.emoji}</span>
+					<span class="cv-editor-nav-tooltip" id={`${section.id}-description`} role="tooltip">
+						{section.description}
+					</span>
+				</button>
 			{/each}
-		</section>
+		</nav>
+
+		{#if saveMessage}
+			<p class="text-sm text-green-300" role="status">{saveMessage}</p>
+		{/if}
+		{#if saveError}
+			<p class="text-sm text-red-300" role="alert">{saveError}</p>
+		{/if}
 
 		<section class="cv-editor-section">
-			<h2>Experience</h2>
-			{#each variant.hiddenJobIds.filter((id) => !data.cv.experience.jobs.some((job) => job.id === id)) as staleId (staleId)}
-				<p class="text-amber-200">
-					A hidden job no longer exists in the main CV.
-					<button class="underline" type="button" onclick={() => removeStaleJobOverride(staleId)}>
-						Remove stale override
-					</button>
-				</p>
-			{/each}
-			{#each data.cv.experience.jobs as job (job.id)}
-				<label class="cv-editor-checkbox">
+			<h2>{sections.find((section) => section.id === selectedSection)?.label}</h2>
+			<label class="cv-editor-checkbox">
+				<input
+					type="checkbox"
+					checked={!sectionHidden(selectedSection)}
+					onchange={(event) => setSectionHidden(selectedSection, !event.currentTarget.checked)}
+				/>
+				Include this section in the variant
+			</label>
+			{#if selectedSection !== 'header'}
+				<label class="cv-editor-field">
+					Section title override
 					<input
-						type="checkbox"
-						checked={!jobHidden(job.id)}
-						onchange={(event) => setJobHidden(job.id, !event.currentTarget.checked)}
+						value={variant.sectionTitles[selectedSection] ?? ''}
+						placeholder={data.cv[selectedSection].title}
+						disabled={sectionHidden(selectedSection)}
+						oninput={(event) => updateSectionTitle(selectedSection, event.currentTarget.value)}
 					/>
-					Show {job.role || 'Untitled role'} — {job.company || 'Untitled company'}
 				</label>
-			{/each}
-		</section>
+			{/if}
 
-		<section class="cv-editor-section">
-			<h2>Skills</h2>
-			{#each Object.keys(variant.skillChanges).filter((id) => !data.cv.skills.skills.some((skill) => skill.id === id)) as staleId (staleId)}
-				<p class="text-amber-200">
-					A skill-row override no longer matches the main CV.
-					<button class="underline" type="button" onclick={() => removeStaleSkillOverride(staleId)}>
-						Remove stale override
-					</button>
-				</p>
-			{/each}
-			{#each data.cv.skills.skills as skill (skill.id)}
-				<div class="cv-editor-entry">
+			{#if selectedSection === 'header'}
+				<label class="cv-editor-field">
+					Name <input value={data.cv.header.name} readonly />
+				</label>
+				<label class="cv-editor-field">
+					Role
+					<input
+						value={variant.textOverrides?.headerRole ?? data.cv.header.role}
+						disabled={sectionHidden('header')}
+						oninput={(event) => updateHeaderText('headerRole', event.currentTarget.value)}
+					/>
+				</label>
+				<label class="cv-editor-field">
+					Introduction
+					<textarea
+						value={variant.textOverrides?.headerSubtitle ?? data.cv.header.subtitle}
+						disabled={sectionHidden('header')}
+						oninput={(event) => updateHeaderText('headerSubtitle', event.currentTarget.value)}
+					></textarea>
+				</label>
+				<h3>Relocation notes</h3>
+				{#each data.cv.header.relocation as note, index (index)}
 					<label class="cv-editor-field">
-						{skill.label}
-						<select
-							value={skillMode(skill.id)}
-							onchange={(event) => setSkillMode(skill.id, event.currentTarget.value)}
-						>
-							<option value="inherit">Use main CV row</option>
-							<option value="hidden">Hide row</option>
-							<option value="replacement">Replace with variant row</option>
-						</select>
+						Note <input value={note} readonly />
 					</label>
-					{#if skillMode(skill.id) === 'replacement'}
-						{@const replacement = skillReplacement(skill.id)}
+				{/each}
+				<h3>Links</h3>
+				{#each data.cv.header.links as link, index (index)}
+					<div class="cv-editor-entry">
 						<label class="cv-editor-field">
-							Replacement label
-							<input
-								value={replacement.label}
-								required
-								oninput={(event) =>
-									updateSkillReplacement(skill.id, 'label', event.currentTarget.value)}
-							/>
+							Label <input value={link.label} readonly />
 						</label>
 						<label class="cv-editor-field">
-							Replacement skills
+							URL <input value={link.href} readonly />
+						</label>
+					</div>
+				{/each}
+			{:else if selectedSection === 'commercialImpact'}
+				{#each data.cv.commercialImpact.highlights as highlight, index (index)}
+					<label class="cv-editor-field">
+						Impact highlight <textarea value={highlight} readonly></textarea>
+					</label>
+				{/each}
+			{:else if selectedSection === 'summary'}
+				<p>Summary wording is editable for this variant; the main CV remains unchanged.</p>
+				{#each summaryParagraphs() as paragraph, index (index)}
+					<div class="cv-editor-entry">
+						<label class="cv-editor-field">
+							Paragraph {index + 1}
 							<textarea
 								class="cv-editor-field-long"
-								value={replacement.value}
-								required
-								oninput={(event) =>
-									updateSkillReplacement(skill.id, 'value', event.currentTarget.value)}></textarea>
+								value={paragraph}
+								disabled={sectionHidden('summary')}
+								oninput={(event) => updateSummaryParagraph(index, event.currentTarget.value)}
+							></textarea>
 						</label>
-					{/if}
-				</div>
-			{/each}
-			<h3>Additional skill rows</h3>
-			{#each variant.addedSkills as skill (skill.id)}
-				<div class="cv-editor-entry">
-					<label class="cv-editor-field">
-						Label <input bind:value={skill.label} required />
-					</label>
-					<label class="cv-editor-field">
-						Skills
-						<textarea class="cv-editor-field-long" bind:value={skill.value} required></textarea>
-					</label>
-					<button
-						class="cv-editor-button cv-editor-button-danger"
-						type="button"
-						onclick={() => removeSkill(skill.id)}>Remove row</button
-					>
-				</div>
-			{/each}
-			<button class="cv-editor-button" type="button" onclick={addSkill}>Add skill row</button>
+						<button
+							class="cv-editor-button cv-editor-button-danger"
+							type="button"
+							disabled={sectionHidden('summary')}
+							onclick={() => removeSummaryParagraph(index)}>Remove paragraph</button
+						>
+					</div>
+				{/each}
+				<button
+					class="cv-editor-button"
+					type="button"
+					disabled={sectionHidden('summary')}
+					onclick={addSummaryParagraph}>Add paragraph</button
+				>
+			{:else if selectedSection === 'experience'}
+				{#each variant.hiddenJobIds.filter((id) => !data.cv.experience.jobs.some((job) => job.id === id)) as staleId (staleId)}
+					<p class="text-amber-200">
+						A hidden job no longer exists in the main CV.
+						<button class="underline" type="button" onclick={() => removeStaleJobOverride(staleId)}>
+							Remove stale override
+						</button>
+					</p>
+				{/each}
+				{#each data.cv.experience.jobs as job (job.id)}
+					{@const bullets = experienceBullets(job.id)}
+					<div class="cv-editor-entry">
+						<label class="cv-editor-checkbox">
+							<input
+								type="checkbox"
+								checked={!jobHidden(job.id)}
+								onchange={(event) => setJobHidden(job.id, !event.currentTarget.checked)}
+							/>
+							Show {job.role || 'Untitled role'} — {job.company || 'Untitled company'}
+						</label>
+						<label class="cv-editor-field">
+							Role <input value={job.role} readonly />
+						</label>
+						<label class="cv-editor-field">
+							Company <input value={job.company} readonly />
+						</label>
+						<label class="cv-editor-field">
+							Dates <input value={job.dates} readonly />
+						</label>
+						<label class="cv-editor-field">
+							Location <input value={job.location} readonly />
+						</label>
+						<h3>Experience wording</h3>
+						{#each bullets as bullet, index (index)}
+							<div class="cv-editor-entry">
+								<label class="cv-editor-checkbox">
+									<input
+										type="checkbox"
+										checked={bullet.paragraph ?? false}
+										disabled={jobHidden(job.id)}
+										onchange={(event) =>
+											updateExperienceBullet(job.id, index, {
+												...bullet,
+												paragraph: event.currentTarget.checked
+											})}
+									/>
+									Use paragraph spacing
+								</label>
+								<label class="cv-editor-field">
+									Bullet wording
+									<textarea
+										class="cv-editor-field-long"
+										value={bullet.content}
+										disabled={jobHidden(job.id)}
+										oninput={(event) =>
+											updateExperienceBullet(job.id, index, {
+												...bullet,
+												content: event.currentTarget.value
+											})}></textarea>
+								</label>
+								<button
+									class="cv-editor-button cv-editor-button-danger"
+									type="button"
+									disabled={jobHidden(job.id)}
+									onclick={() => removeExperienceBullet(job.id, index)}>Remove wording</button
+								>
+							</div>
+						{/each}
+						<button
+							class="cv-editor-button"
+							type="button"
+							disabled={jobHidden(job.id)}
+							onclick={() => addExperienceBullet(job.id)}>Add wording</button
+						>
+					</div>
+				{/each}
+			{:else if selectedSection === 'skills'}
+				{#each Object.keys(variant.skillChanges).filter((id) => !data.cv.skills.skills.some((skill) => skill.id === id)) as staleId (staleId)}
+					<p class="text-amber-200">
+						A skill-row override no longer matches the main CV.
+						<button
+							class="underline"
+							type="button"
+							onclick={() => removeStaleSkillOverride(staleId)}
+						>
+							Remove stale override
+						</button>
+					</p>
+				{/each}
+				{#each data.cv.skills.skills as skill (skill.id)}
+					<div class="cv-editor-entry">
+						<label class="cv-editor-checkbox">
+							<input
+								type="checkbox"
+								checked={!skillHidden(skill.id)}
+								onchange={(event) => setSkillHidden(skill.id, !event.currentTarget.checked)}
+							/>
+							Show this skill group
+						</label>
+						<label class="cv-editor-field">
+							Skill group <input value={skillLabel(skill.id, skill.label)} readonly />
+						</label>
+						<label class="cv-editor-field">
+							Skills <textarea value={skillValue(skill.id, skill.value)} readonly></textarea>
+						</label>
+						{#if skillHidden(skill.id)}
+							<p>This row is hidden in the variant.</p>
+						{/if}
+					</div>
+				{/each}
+				{#each variant.addedSkills as skill (skill.id)}
+					<div class="cv-editor-entry">
+						<label class="cv-editor-field">
+							Skill group <input value={skill.label} readonly />
+						</label>
+						<label class="cv-editor-field">
+							Skills <textarea value={skill.value} readonly></textarea>
+						</label>
+					</div>
+				{/each}
+			{:else}
+				{#each data.cv.education.entries as entry, index (index)}
+					<div class="cv-editor-entry">
+						<label class="cv-editor-field">
+							Qualification <input value={entry.qualification} readonly />
+						</label>
+						<label class="cv-editor-field">
+							Institution <input value={entry.institution} readonly />
+						</label>
+						<label class="cv-editor-field">
+							Date <input value={entry.date} readonly />
+						</label>
+						<label class="cv-editor-field">
+							Location <input value={entry.location} readonly />
+						</label>
+						<label class="cv-editor-field">
+							Specialization <input value={entry.specialization} readonly />
+						</label>
+					</div>
+				{/each}
+			{/if}
 		</section>
 
 		<section class="cv-editor-section">

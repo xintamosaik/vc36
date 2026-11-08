@@ -69,6 +69,13 @@ export type CvSection = keyof CvData;
 export type CvVariantSkillChange =
 	{ kind: 'hidden' } | { kind: 'replacement'; label: string; value: string };
 
+export type CvVariantTextOverrides = {
+	headerRole?: string;
+	headerSubtitle?: string;
+	summaryParagraphs?: string[];
+	experienceBullets?: Record<string, ExperienceBullet[]>;
+};
+
 export type CvVariant = {
 	id: string;
 	name: string;
@@ -77,4 +84,5 @@ export type CvVariant = {
 	hiddenJobIds: string[];
 	skillChanges: Record<string, CvVariantSkillChange>;
 	addedSkills: Skill[];
+	textOverrides?: CvVariantTextOverrides;
 };

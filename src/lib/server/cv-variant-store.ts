@@ -28,6 +28,14 @@ function isSkill(value: unknown): value is { id: string; label: string; value: s
 	);
 }
 
+function isExperienceBullet(value: unknown): boolean {
+	return (
+		isRecord(value) &&
+		typeof value.content === 'string' &&
+		(value.paragraph === undefined || typeof value.paragraph === 'boolean')
+	);
+}
+
 export function isCvVariant(value: unknown): value is CvVariant {
 	if (
 		!isRecord(value) ||
@@ -49,7 +57,21 @@ export function isCvVariant(value: unknown): value is CvVariant {
 		!isRecord(value.skillChanges) ||
 		!Object.keys(value.skillChanges).every((id) => id.length > 0) ||
 		!Array.isArray(value.addedSkills) ||
-		!value.addedSkills.every(isSkill)
+		!value.addedSkills.every(isSkill) ||
+		(value.textOverrides !== undefined &&
+			(!isRecord(value.textOverrides) ||
+				(value.textOverrides.headerRole !== undefined &&
+					typeof value.textOverrides.headerRole !== 'string') ||
+				(value.textOverrides.headerSubtitle !== undefined &&
+					typeof value.textOverrides.headerSubtitle !== 'string') ||
+				(value.textOverrides.summaryParagraphs !== undefined &&
+					!isStringArray(value.textOverrides.summaryParagraphs)) ||
+				(value.textOverrides.experienceBullets !== undefined &&
+					(!isRecord(value.textOverrides.experienceBullets) ||
+						!Object.entries(value.textOverrides.experienceBullets).every(
+							([jobId, bullets]) =>
+								jobId.length > 0 && Array.isArray(bullets) && bullets.every(isExperienceBullet)
+						)))))
 	) {
 		return false;
 	}
@@ -132,7 +154,8 @@ export async function createCvVariant(name: string): Promise<CvVariant> {
 		sectionTitles: {},
 		hiddenJobIds: [],
 		skillChanges: {},
-		addedSkills: []
+		addedSkills: [],
+		textOverrides: {}
 	};
 	await writeAtomic(variantPath(variant.id), variant);
 	return variant;

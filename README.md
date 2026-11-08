@@ -45,7 +45,7 @@ npm run dev -- --open
 
 The CV editor loads its initial content from `src/lib/data/cv` and saves edits as JSON files in `data/cv` at the project root. The `data/cv` folder is created on the first save and can be version-controlled or synced with Git. The save API only accepts requests from the local machine; run the app locally rather than exposing it to a network.
 
-Additional CVs are managed from the Documents mode. Each variant stores only differences from the main CV and inherits other content. Variants can hide sections and jobs, override section titles, and hide or replace skill rows or add complete new rows. Job and skill-row IDs are persisted so variants keep pointing at the same entries if their order changes. Existing saved entries receive IDs automatically when read.
+Additional CVs are managed from the Documents mode. Each variant stores only differences from the main CV and inherits other content. The variant editor uses the same six emoji section buttons as the main editor. Identity, impact, job details, skills, and education remain factual and read-only; variants can tailor the header role and introduction, summary paragraphs, and experience wording. Variants can also hide sections, jobs, or skill rows and override section titles. Job and skill-row IDs are persisted so variants keep pointing at the same entries if their order changes. Existing saved entries receive IDs automatically when read.
 
 For bold text in supported CV copy fields, use the sparse FAT syntax `##bold text##`. Other Markdown syntax is displayed as plain text.
 

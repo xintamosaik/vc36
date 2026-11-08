@@ -159,6 +159,13 @@
 		resize: vertical;
 	}
 
+	.cv-editor-field input:read-only,
+	.cv-editor-field textarea:read-only {
+		background: #232421;
+		color: #b6b5ad;
+		cursor: default;
+	}
+
 	.cv-editor-field textarea.cv-editor-field-long {
 		min-height: 12rem;
 	}

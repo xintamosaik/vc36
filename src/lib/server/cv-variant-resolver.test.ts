@@ -33,7 +33,8 @@ const emptyVariant: CvVariant = {
 	sectionTitles: {},
 	hiddenJobIds: [],
 	skillChanges: {},
-	addedSkills: []
+	addedSkills: [],
+	textOverrides: {}
 };
 
 describe('resolveCvVariant', () => {
@@ -78,6 +79,36 @@ describe('resolveCvVariant', () => {
 		expect(resolved.skills.skills).toEqual([]);
 	});
 
+	it('overrides summary and experience wording without changing factual job fields', () => {
+		const cv = structuredClone(mainCv);
+		cv.summary.paragraphs = ['Main summary'];
+		cv.experience.jobs[0].bullets = [{ content: 'Main wording' }];
+
+		const resolved = resolveCvVariant(cv, {
+			...emptyVariant,
+			textOverrides: {
+				headerRole: 'Tailored role',
+				headerSubtitle: 'Tailored introduction',
+				summaryParagraphs: ['Variant summary'],
+				experienceBullets: { 'job-1': [{ content: 'Variant wording', paragraph: true }] }
+			}
+		});
+
+		expect(resolved.header).toMatchObject({
+			name: 'Name',
+			role: 'Tailored role',
+			subtitle: 'Tailored introduction'
+		});
+		expect(resolved.summary.paragraphs).toEqual(['Variant summary']);
+		expect(resolved.experience.jobs[0]).toMatchObject({
+			role: 'Engineer',
+			company: 'Company',
+			bullets: [{ content: 'Variant wording', paragraph: true }]
+		});
+		expect(cv.summary.paragraphs).toEqual(['Main summary']);
+		expect(cv.experience.jobs[0].bullets).toEqual([{ content: 'Main wording' }]);
+	});
+
 	it('rejects stale job and skill references explicitly', () => {
 		expect(() =>
 			resolveCvVariant(mainCv, { ...emptyVariant, hiddenJobIds: ['missing-job'] })
@@ -88,5 +119,11 @@ describe('resolveCvVariant', () => {
 				skillChanges: { 'missing-skill': { kind: 'hidden' } }
 			})
 		).toThrow('Variant references unknown skill row');
+		expect(() =>
+			resolveCvVariant(mainCv, {
+				...emptyVariant,
+				textOverrides: { experienceBullets: { 'missing-job': [] } }
+			})
+		).toThrow('Variant references unknown job');
 	});
 });

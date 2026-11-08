@@ -8,6 +8,9 @@ export function resolveCvVariant(cv: CvData, variant: CvVariant): CvData {
 	for (const jobId of variant.hiddenJobIds) {
 		if (!jobIds.has(jobId)) throw new TypeError(`Variant references unknown job: ${jobId}`);
 	}
+	for (const jobId of Object.keys(variant.textOverrides?.experienceBullets ?? {})) {
+		if (!jobIds.has(jobId)) throw new TypeError(`Variant references unknown job: ${jobId}`);
+	}
 	for (const skillId of Object.keys(variant.skillChanges)) {
 		if (!skillIds.has(skillId))
 			throw new TypeError(`Variant references unknown skill row: ${skillId}`);
@@ -28,6 +31,20 @@ export function resolveCvVariant(cv: CvData, variant: CvVariant): CvData {
 		return [{ ...skill, label: change.label, value: change.value }];
 	});
 	result.skills.skills.push(...structuredClone(variant.addedSkills));
+
+	if (variant.textOverrides?.headerRole !== undefined) {
+		result.header.role = variant.textOverrides.headerRole;
+	}
+	if (variant.textOverrides?.headerSubtitle !== undefined) {
+		result.header.subtitle = variant.textOverrides.headerSubtitle;
+	}
+	if (variant.textOverrides?.summaryParagraphs) {
+		result.summary.paragraphs = structuredClone(variant.textOverrides.summaryParagraphs);
+	}
+	for (const [jobId, bullets] of Object.entries(variant.textOverrides?.experienceBullets ?? {})) {
+		const job = result.experience.jobs.find((item) => item.id === jobId);
+		if (job) job.bullets = structuredClone(bullets);
+	}
 
 	for (const section of Object.keys(variant.sectionTitles) as Exclude<CvSection, 'header'>[]) {
 		result[section].title = variant.sectionTitles[section] ?? result[section].title;
