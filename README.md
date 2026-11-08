@@ -49,6 +49,8 @@ Additional CVs are managed from the Documents mode. Each variant stores only dif
 
 For bold text in supported CV copy fields, use the sparse FAT syntax `##bold text##`. Other Markdown syntax is displayed as plain text.
 
+Jobs and skill groups cannot be removed while a variant explicitly references them through hidden-item settings, tailored job wording, or skill overrides. The editor checks current variants and shows which ones prevent removal. Remove those references or delete the dependent variant first, then choose “Check references again”. Saving also checks references before writing, so edits in another tab cannot leave dangling references.
+
 ## Building
 
 To create a production version of your app:

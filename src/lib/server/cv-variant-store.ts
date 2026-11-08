@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import type { CvData, CvSection, CvVariant, CvVariantSkillChange } from '#lib/types/cv.js';
 import { readCvData } from '#lib/server/cv-store.js';
 import { resolveCvVariant } from '#lib/server/cv-variant-resolver.js';
+import { withCvWrite } from './cv-write.js';
 
 const variantsDirectory = resolve(process.cwd(), 'data', 'cv', 'variants');
 const idPattern = /^[\da-f]{8}-[\da-f]{4}-[1-8][\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i;
@@ -173,10 +174,12 @@ export async function writeCvVariant(id: string, value: unknown): Promise<CvVari
 	) {
 		throw new TypeError('Each replacement skill row needs both a label and skill content');
 	}
-	const mainCv = await readCvData();
-	resolveCvVariant(mainCv, value);
-	await writeAtomic(variantPath(id), value);
-	return value;
+	return withCvWrite(async () => {
+		const mainCv = await readCvData();
+		resolveCvVariant(mainCv, value);
+		await writeAtomic(variantPath(id), value);
+		return value;
+	});
 }
 
 export async function deleteCvVariant(id: string): Promise<boolean> {

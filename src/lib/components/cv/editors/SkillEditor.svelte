@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Skills } from '#lib/types/cv.js';
+	import RemoveReferencedEntryButton from './RemoveReferencedEntryButton.svelte';
 
 	let {
 		skill = $bindable(),
@@ -19,7 +20,5 @@
 			bind:value={skill.value}
 			placeholder="Wrap bold text in ##double hashes##"></textarea>
 	</label>
-	<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
-		>Remove skill group</button
-	>
+	<RemoveReferencedEntryButton id={skill.id} section="skills" label="skill group" {onRemove} />
 </div>

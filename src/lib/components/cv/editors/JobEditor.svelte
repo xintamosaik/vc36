@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ExperienceBulletEditor from '#lib/components/cv/editors/ExperienceBulletEditor.svelte';
+	import RemoveReferencedEntryButton from './RemoveReferencedEntryButton.svelte';
 	import ItemSelector from '#lib/components/cv/editors/ItemSelector.svelte';
 	import { selectedIndexAfterRemoval } from '#lib/components/cv/editors/item-selection.js';
 	import type { Job } from '#lib/types/cv.js';
@@ -39,8 +40,6 @@
 		/>
 	{/if}
 	<div class="cv-editor-actions">
-		<button class="cv-editor-button cv-editor-button-danger" type="button" onclick={onRemove}
-			>Remove job</button
-		>
+		<RemoveReferencedEntryButton id={job.id} section="experience" label="job" {onRemove} />
 	</div>
 </article>

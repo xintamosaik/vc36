@@ -1,9 +1,12 @@
 import { page } from 'vitest/browser';
-import { expect, it } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import ExperienceEditorTestHarness from './ExperienceEditorTestHarness.svelte';
 
+afterEach(() => vi.restoreAllMocks());
+
 it('resets bullet selection when switching jobs and preserves edited wording', async () => {
+	vi.spyOn(globalThis, 'fetch').mockImplementation(async () => Response.json([]));
 	await render(ExperienceEditorTestHarness, {
 		data: {
 			title: 'Experience',
