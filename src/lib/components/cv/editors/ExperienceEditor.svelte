@@ -36,10 +36,12 @@
 		onAdd={addJob}
 	/>
 	{#if selectedJobIndex >= 0}
-		<JobEditor
-			bind:job={data.jobs[selectedJobIndex]}
-			onRemove={() => removeJob(selectedJobIndex)}
-		/>
+		{#key data.jobs[selectedJobIndex].id}
+			<JobEditor
+				bind:job={data.jobs[selectedJobIndex]}
+				onRemove={() => removeJob(selectedJobIndex)}
+			/>
+		{/key}
 	{/if}
 	<div class="cv-editor-actions">
 		<button class="cv-editor-button cv-editor-button-primary" type="button" onclick={onSave}
