@@ -4,13 +4,15 @@
 		selectedIndex = $bindable(),
 		itemLabel,
 		ariaLabel,
-		onAdd
+		onAdd,
+		disabled = false
 	}: {
 		items: string[];
 		selectedIndex: number;
 		itemLabel: string;
 		ariaLabel: string;
 		onAdd: () => void;
+		disabled?: boolean;
 	} = $props();
 
 	function itemNumber(index: number) {
@@ -19,26 +21,30 @@
 </script>
 
 <div class="cv-editor-item-nav" role="group" aria-label={ariaLabel}>
-	{#each items as item, index (index)}
+	<div class="cv-editor-item-nav-items">
+		{#each items as item, index (index)}
+			<button
+				class="cv-editor-item-button"
+				class:active={selectedIndex === index}
+				type="button"
+				{disabled}
+				aria-label={`Edit ${itemLabel} ${index + 1}`}
+				aria-pressed={selectedIndex === index}
+				title={`${itemLabel} ${index + 1}${item ? `: ${item.replaceAll('##', '')}` : ''}`}
+				onclick={() => (selectedIndex = index)}
+			>
+				<span aria-hidden="true">{itemNumber(index)}</span>
+			</button>
+		{/each}
 		<button
 			class="cv-editor-item-button"
-			class:active={selectedIndex === index}
 			type="button"
-			aria-label={`Edit ${itemLabel} ${index + 1}`}
-			aria-pressed={selectedIndex === index}
-			title={`${itemLabel} ${index + 1}${item ? `: ${item.replaceAll('##', '')}` : ''}`}
-			onclick={() => (selectedIndex = index)}
+			{disabled}
+			aria-label={`Add ${itemLabel}`}
+			title={`Add ${itemLabel}`}
+			onclick={onAdd}
 		>
-			<span aria-hidden="true">{itemNumber(index)}</span>
+			<span aria-hidden="true">➕</span>
 		</button>
-	{/each}
-	<button
-		class="cv-editor-item-button"
-		type="button"
-		aria-label={`Add ${itemLabel}`}
-		title={`Add ${itemLabel}`}
-		onclick={onAdd}
-	>
-		<span aria-hidden="true">➕</span>
-	</button>
+	</div>
 </div>

@@ -94,7 +94,7 @@
 	<title>CV - Ulf Dellbrügge</title>
 </svelte:head>
 
-<main class="cv-workspace mx-auto min-h-screen w-full max-w-[75ch] px-4 py-6">
+<main class="cv-workspace mx-auto min-h-screen w-full max-w-[88ch] px-4 py-6">
 	<WorkspaceNavigation active="editor" />
 	<section class="cv-tools space-y-6" aria-label="CV editor">
 		{#if isLoading}

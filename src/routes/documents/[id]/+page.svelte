@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import WorkspaceNavigation from '#lib/components/cv/WorkspaceNavigation.svelte';
+	import ItemSelector from '#lib/components/cv/editors/ItemSelector.svelte';
+	import { selectedIndexAfterRemoval } from '#lib/components/cv/editors/item-selection.js';
 	import '#lib/components/cv/editors/editor.css';
 	import type { CvSection, CvVariant, ExperienceBullet } from '#lib/types/cv.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	let selectedSection = $state<CvSection>('header');
+	let selectedSummaryIndex = $state(-1);
+	let selectedBulletIndexes = $state<Record<string, number>>({});
 	// This is an editable local draft; route data remains unchanged until saved.
 	let variant = $state<CvVariant>({
 		id: '',
@@ -26,6 +30,16 @@
 		const nextVariant = structuredClone(data.variant);
 		nextVariant.textOverrides ??= {};
 		variant = nextVariant;
+		selectedSummaryIndex =
+			(nextVariant.textOverrides.summaryParagraphs ?? data.cv.summary.paragraphs).length > 0
+				? 0
+				: -1;
+		selectedBulletIndexes = Object.fromEntries(
+			data.cv.experience.jobs.map((job) => {
+				const bullets = nextVariant.textOverrides?.experienceBullets?.[job.id] ?? job.bullets;
+				return [job.id, bullets.length > 0 ? 0 : -1];
+			})
+		);
 	});
 
 	const sections: { id: CvSection; label: string; emoji: string; description: string }[] = [
@@ -114,6 +128,7 @@
 	}
 
 	function addSummaryParagraph() {
+		selectedSummaryIndex = summaryParagraphs().length;
 		variant.textOverrides = {
 			...variant.textOverrides,
 			summaryParagraphs: [...summaryParagraphs(), '']
@@ -121,6 +136,11 @@
 	}
 
 	function removeSummaryParagraph(index: number) {
+		selectedSummaryIndex = selectedIndexAfterRemoval(
+			selectedSummaryIndex,
+			index,
+			summaryParagraphs().length - 1
+		);
 		variant.textOverrides = {
 			...variant.textOverrides,
 			summaryParagraphs: summaryParagraphs().filter((_, paragraphIndex) => paragraphIndex !== index)
@@ -152,10 +172,16 @@
 	}
 
 	function addExperienceBullet(jobId: string) {
+		selectedBulletIndexes[jobId] = experienceBullets(jobId).length;
 		updateExperienceBullets(jobId, [...experienceBullets(jobId), { content: '' }]);
 	}
 
 	function removeExperienceBullet(jobId: string, index: number) {
+		selectedBulletIndexes[jobId] = selectedIndexAfterRemoval(
+			selectedBulletIndexes[jobId],
+			index,
+			experienceBullets(jobId).length - 1
+		);
 		updateExperienceBullets(
 			jobId,
 			experienceBullets(jobId).filter((_, bulletIndex) => bulletIndex !== index)
@@ -230,7 +256,7 @@
 	<title>{variant.name} - CV - Ulf Dellbrügge</title>
 </svelte:head>
 
-<main class="cv-workspace mx-auto min-h-screen w-full max-w-[75ch] px-4 py-6">
+<main class="cv-workspace mx-auto min-h-screen w-full max-w-[88ch] px-4 py-6">
 	<WorkspaceNavigation active="editor" variantId={variant.id} />
 	<section class="cv-tools space-y-6" aria-label="CV variant editor">
 		<section class="cv-editor-section">
@@ -338,31 +364,35 @@
 				{/each}
 			{:else if selectedSection === 'summary'}
 				<p>Summary wording is editable for this variant; the main CV remains unchanged.</p>
-				{#each summaryParagraphs() as paragraph, index (index)}
+				<ItemSelector
+					items={summaryParagraphs()}
+					bind:selectedIndex={selectedSummaryIndex}
+					itemLabel="summary paragraph"
+					ariaLabel="Summary paragraphs"
+					onAdd={addSummaryParagraph}
+					disabled={sectionHidden('summary')}
+				/>
+				{#if selectedSummaryIndex >= 0}
+					{@const paragraph = summaryParagraphs()[selectedSummaryIndex]}
 					<div class="cv-editor-entry">
 						<label class="cv-editor-field">
-							Paragraph {index + 1}
+							Paragraph
 							<textarea
 								class="cv-editor-field-long"
 								value={paragraph}
 								disabled={sectionHidden('summary')}
-								oninput={(event) => updateSummaryParagraph(index, event.currentTarget.value)}
+								oninput={(event) =>
+									updateSummaryParagraph(selectedSummaryIndex, event.currentTarget.value)}
 							></textarea>
 						</label>
 						<button
 							class="cv-editor-button cv-editor-button-danger"
 							type="button"
 							disabled={sectionHidden('summary')}
-							onclick={() => removeSummaryParagraph(index)}>Remove paragraph</button
+							onclick={() => removeSummaryParagraph(selectedSummaryIndex)}>Remove paragraph</button
 						>
 					</div>
-				{/each}
-				<button
-					class="cv-editor-button"
-					type="button"
-					disabled={sectionHidden('summary')}
-					onclick={addSummaryParagraph}>Add paragraph</button
-				>
+				{/if}
 			{:else if selectedSection === 'experience'}
 				{#each variant.hiddenJobIds.filter((id) => !data.cv.experience.jobs.some((job) => job.id === id)) as staleId (staleId)}
 					<p class="text-amber-200">
@@ -396,7 +426,16 @@
 							Location <input value={job.location} readonly />
 						</label>
 						<h3>Experience wording</h3>
-						{#each bullets as bullet, index (index)}
+						<ItemSelector
+							items={bullets.map((bullet) => bullet.content.replaceAll('##', ''))}
+							bind:selectedIndex={selectedBulletIndexes[job.id]}
+							itemLabel="experience wording"
+							ariaLabel={`${job.role || 'Job'} experience wording`}
+							onAdd={() => addExperienceBullet(job.id)}
+							disabled={jobHidden(job.id)}
+						/>
+						{#if selectedBulletIndexes[job.id] >= 0}
+							{@const bullet = bullets[selectedBulletIndexes[job.id]]}
 							<div class="cv-editor-entry">
 								<label class="cv-editor-checkbox">
 									<input
@@ -404,7 +443,7 @@
 										checked={bullet.paragraph ?? false}
 										disabled={jobHidden(job.id)}
 										onchange={(event) =>
-											updateExperienceBullet(job.id, index, {
+											updateExperienceBullet(job.id, selectedBulletIndexes[job.id], {
 												...bullet,
 												paragraph: event.currentTarget.checked
 											})}
@@ -418,7 +457,7 @@
 										value={bullet.content}
 										disabled={jobHidden(job.id)}
 										oninput={(event) =>
-											updateExperienceBullet(job.id, index, {
+											updateExperienceBullet(job.id, selectedBulletIndexes[job.id], {
 												...bullet,
 												content: event.currentTarget.value
 											})}></textarea>
@@ -427,16 +466,11 @@
 									class="cv-editor-button cv-editor-button-danger"
 									type="button"
 									disabled={jobHidden(job.id)}
-									onclick={() => removeExperienceBullet(job.id, index)}>Remove wording</button
+									onclick={() => removeExperienceBullet(job.id, selectedBulletIndexes[job.id])}
+									>Remove wording</button
 								>
 							</div>
-						{/each}
-						<button
-							class="cv-editor-button"
-							type="button"
-							disabled={jobHidden(job.id)}
-							onclick={() => addExperienceBullet(job.id)}>Add wording</button
-						>
+						{/if}
 					</div>
 				{/each}
 			{:else if selectedSection === 'skills'}
